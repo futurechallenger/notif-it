@@ -7,8 +7,9 @@ import * as path from 'path';
 dotenv.config();
 
 const app = new Koa();
-const middlePath = process.env.NODE_ENV === 'dev' ? '..' : '.';
-app.use(serve(path.join(__dirname, middlePath, 'client/build')));
+const clientPath =
+  process.env.NODE_ENV === 'dev' ? '../client/build' : './client';
+app.use(serve(path.join(__dirname, clientPath)));
 app.use(cors());
 
 const port = process.env.PORT || 8333;
