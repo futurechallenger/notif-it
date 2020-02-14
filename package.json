@@ -4,6 +4,19 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "koa": "^2.11.0"
+    "koa": "^2.11.0",
+    "koa-cors": "^0.0.16",
+    "koa-static": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/koa": "^2.11.1",
+    "@types/koa-cors": "^0.0.0",
+    "@types/koa-static": "^4.0.1",
+    "dotenv": "^8.2.0",
+    "jest": "^25.1.0",
+    "ts-jest": "^25.2.0",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
   }
 }
