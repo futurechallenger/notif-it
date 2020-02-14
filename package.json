@@ -7,8 +7,9 @@
     "node": "10.x"
   },
   "scripts": {
+    "postinstall": "rm -rf ./build && yarn build:server && cd client && yarn build && cd .. && cp -r client/build build/client ",
     "build:server": "tsc -p .",
-    "start": "node --require ts-node/register src/app.ts"
+    "start": "node build/app.js"
   },
   "dependencies": {
     "koa": "^2.11.0",
