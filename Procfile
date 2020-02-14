@@ -1,1 +1,1 @@
-web: node index.js
+web: node --require ts-node/register src/app.ts 
