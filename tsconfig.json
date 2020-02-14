@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    // "noEmit": true,
+    "jsx": "react",
+    "types": ["jest", "node"],
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "lib": ["ESNext"],
+    "target": "esnext",
+    "allowJs": true,
+    // "allowSyntheticDefaultImports": true,
+    "esModuleInterop": false,
+    "alwaysStrict": true,
+    "strict": false,
+    "baseUrl": ".",
+    "outDir": "./build"
+    // "paths": {
+    //   "@lib/*": ["lib/*"],
+    //   "@interfaces/*": ["interfaces/*"],
+    //   "@conference/*": ["services/conference/src/lambda/*"],
+    //   "@meeting/*": ["services/meeting/src/lambda/*"],
+    //   "@services/*": ["services/*"]
+    // }
+  },
+  // "exclude": ["**/*.js"]
+  "exclude": ["node_modules", "build", "client"]
+}
