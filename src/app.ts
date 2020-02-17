@@ -66,10 +66,6 @@ const getRequestToken = (): Promise<RequestToken> => {
   });
 };
 
-// interface AccessTokenInfo {
-//   data: any;
-// }
-
 const getAccessToken = (
   token: string,
   tokenSecret: string,
