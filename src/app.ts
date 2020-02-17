@@ -96,6 +96,8 @@ const clientPath =
 app.use(serve(path.join(__dirname, clientPath)));
 app.use(cors());
 
+app.use(router.routes());
+
 const port = process.env.PORT || 8333;
 
 app.listen(port, () => {
