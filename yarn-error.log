@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /Users/bruce.li/.yarn/bin/yarn.js postinstall
+  /usr/local/bin/node /Users/bruce.li/.yarn/bin/yarn.js add @types/url -D
 
 PATH: 
   /Users/bruce.li/.yarn/bin:/Users/bruce.li/.config/yarn/global/node_modules/.bin:/Users/bruce.li/Library/Python/3.7/bin:/Library/Frameworks/Python.framework/Versions/3.7/bin:/Users/bruce.li/bin:/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/munki:/Users/bruce.li/.yarn/bin:/Users/bruce.li/.config/yarn/global/node_modules/.bin:/Users/bruce.li/Library/Python/3.7/bin:/Library/Frameworks/Python.framework/Versions/3.7/bin:/Users/bruce.li/bin
@@ -14,12 +14,17 @@ Platform:
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/bruce.li/Documents/work/ringcentral/jupiter-integration/package.json: Unexpected token / in JSON at position 157
-      at JSON.parse (<anonymous>)
-      at /Users/bruce.li/.yarn/lib/cli.js:1625:59
-      at Generator.next (<anonymous>)
-      at step (/Users/bruce.li/.yarn/lib/cli.js:310:30)
-      at /Users/bruce.li/.yarn/lib/cli.js:321:13
+  Error: https://registry.yarnpkg.com/@types%2furl: Not found
+      at Request.params.callback [as _callback] (/Users/bruce.li/.yarn/lib/cli.js:66947:18)
+      at Request.self.callback (/Users/bruce.li/.yarn/lib/cli.js:140665:22)
+      at Request.emit (events.js:198:13)
+      at Request.<anonymous> (/Users/bruce.li/.yarn/lib/cli.js:141637:10)
+      at Request.emit (events.js:198:13)
+      at IncomingMessage.<anonymous> (/Users/bruce.li/.yarn/lib/cli.js:141559:12)
+      at Object.onceWrapper (events.js:286:20)
+      at IncomingMessage.emit (events.js:203:15)
+      at endReadableNT (_stream_readable.js:1145:12)
+      at process._tickCallback (internal/process/next_tick.js:63:19)
 
 npm manifest: 
   {
@@ -31,22 +36,24 @@ npm manifest:
       "node": "10.x"
     },
     "scripts": {
-      // "postinstall": "yarn build:server && cd client && yarn build && cd .. && cp -r client/build build/client ",
-      "postinstall": "sh scripts/postinstall.sh",
+      "postinstall": "sh ./scripts/postinstall.sh",
       "build:server": "tsc -p .",
       "start": "node build/app.js"
     },
     "dependencies": {
+      "dotenv": "^8.2.0",
       "koa": "^2.11.0",
       "koa-cors": "^0.0.16",
-      "koa-static": "^5.0.0"
+      "koa-static": "^5.0.0",
+      "oauth": "^0.9.15",
+      "url": "^0.11.0"
     },
     "devDependencies": {
       "@types/dotenv": "^8.2.0",
       "@types/koa": "^2.11.1",
       "@types/koa-cors": "^0.0.0",
       "@types/koa-static": "^4.0.1",
-      "dotenv": "^8.2.0",
+      "@types/oauth": "^0.9.1",
       "jest": "^25.1.0",
       "ts-jest": "^25.2.0",
       "ts-node": "^8.6.2",
@@ -566,6 +573,13 @@ Lockfile:
     version "13.7.1"
     resolved "https://registry.yarnpkg.com/@types/node/-/node-13.7.1.tgz#238eb34a66431b71d2aaddeaa7db166f25971a0d"
     integrity sha512-Zq8gcQGmn4txQEJeiXo/KiLpon8TzAl0kmKH4zdWctPj05nWwp1ClMdAVEloqrQKfaC48PNLdgN/aVaLqUrluA==
+  
+  "@types/oauth@^0.9.1":
+    version "0.9.1"
+    resolved "https://registry.yarnpkg.com/@types/oauth/-/oauth-0.9.1.tgz#e17221e7f7936b0459ae7d006255dff61adca305"
+    integrity sha512-a1iY62/a3yhZ7qH7cNUsxoI3U/0Fe9+RnuFrpTKr+0WVOzbKlSLojShCKe20aOD1Sppv+i8Zlq0pLDuTJnwS4A==
+    dependencies:
+      "@types/node" "*"
   
   "@types/range-parser@*":
     version "1.2.3"
@@ -2832,6 +2846,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/oauth-sign/-/oauth-sign-0.9.0.tgz#47a7b016baa68b5fa0ecf3dee08a85c679ac6455"
     integrity sha512-fexhUFFPTGV8ybAtSIGbV6gOkSv8UtRbDBnAyLQw4QPKkgNlsH2ByPGtMUqdWkos6YCRmAqViwgZrJc/mRDzZQ==
   
+  oauth@^0.9.15:
+    version "0.9.15"
+    resolved "https://registry.yarnpkg.com/oauth/-/oauth-0.9.15.tgz#bd1fefaf686c96b75475aed5196412ff60cfb9c1"
+    integrity sha1-vR/vr2hslrdUda7VGWQS/2DPucE=
+  
   object-assign@^4.0.1:
     version "4.1.1"
     resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"
@@ -3070,6 +3089,11 @@ Lockfile:
       end-of-stream "^1.1.0"
       once "^1.3.1"
   
+  punycode@1.3.2:
+    version "1.3.2"
+    resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.3.2.tgz#9653a036fb7c1ee42342f2325cceefea3926c48d"
+    integrity sha1-llOgNvt8HuQjQvIyXM7v6jkmxI0=
+  
   punycode@^2.1.0, punycode@^2.1.1:
     version "2.1.1"
     resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
@@ -3079,6 +3103,11 @@ Lockfile:
     version "6.5.2"
     resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
     integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
+  
+  querystring@0.2.0:
+    version "0.2.0"
+    resolved "https://registry.yarnpkg.com/querystring/-/querystring-0.2.0.tgz#b209849203bb25df820da756e747005878521620"
+    integrity sha1-sgmEkgO7Jd+CDadW50cAWHhSFiA=
   
   react-is@^16.12.0:
     version "16.12.0"
@@ -3774,6 +3803,14 @@ Lockfile:
     version "0.1.0"
     resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
     integrity sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
+  
+  url@^0.11.0:
+    version "0.11.0"
+    resolved "https://registry.yarnpkg.com/url/-/url-0.11.0.tgz#3838e97cfc60521eb73c525a8e55bfdd9e2e28f1"
+    integrity sha1-ODjpfPxgUh63PFJajlW/3Z4uKPE=
+    dependencies:
+      punycode "1.3.2"
+      querystring "0.2.0"
   
   use@^3.1.0:
     version "3.1.1"

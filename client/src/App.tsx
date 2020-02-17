@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { Button } from '@material-ui/core';
 
 const App = () => {
   return (
@@ -10,14 +11,15 @@ const App = () => {
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            console.log('Button clicked');
+          }}
         >
-          Learn React
-        </a>
+          Primary
+        </Button>
       </header>
     </div>
   );
