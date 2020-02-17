@@ -19,7 +19,23 @@ const App = () => {
         >
           Learn React
         </a>
-        <Button variant="contained" color="primary">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            window.Trello.authorize({
+              type: 'popup',
+              name: 'Getting Started Application',
+              scope: {
+                read: 'true',
+                write: 'true',
+              },
+              expiration: 'never',
+              success: (v: any) => console.log('===>Success', v),
+              error: (e: any) => console.log('===>Err', e),
+            });
+          }}
+        >
           Primary
         </Button>
       </header>
