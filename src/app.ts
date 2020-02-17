@@ -36,7 +36,13 @@ const oauth = new OAuth(
 // handlers
 const login = function(ctx: Koa.Context) {
   oauth.getOAuthRequestToken((error, token, tokenSecret, results) => {
-    console.log('===>LOGIN ERROR', error, token, tokenSecret, results);
+    console.log(
+      '===>LOGIN ERROR',
+      error,
+      token,
+      tokenSecret,
+      JSON.stringify(results),
+    );
 
     oauth_secrets[token] = tokenSecret;
     ctx.redirect(
