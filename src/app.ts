@@ -33,57 +33,103 @@ const oauth = new OAuth(
   'HMAC-SHA1',
 );
 
-// handlers
-const login = function(ctx: Koa.Context) {
-  oauth.getOAuthRequestToken((error, token, tokenSecret, results) => {
-    console.log(
-      '===>LOGIN ERROR',
-      error,
+interface RequestToken {
+  token: string;
+  tokenSecret: string;
+  results: any[];
+}
+
+const getRequestToken = (): Promise<RequestToken> => {
+  return new Promise((resolve, reject) => {
+    oauth.getOAuthRequestToken((error, token, tokenSecret, results) => {
+      console.log(
+        '===>LOGIN INFO',
+        JSON.stringify({
+          error,
+          token,
+          tokenSecret,
+          results,
+        }),
+      );
+
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      resolve({
+        token,
+        tokenSecret,
+        results,
+      });
+    });
+  });
+};
+
+// interface AccessTokenInfo {
+//   data: any;
+// }
+
+const getAccessToken = (
+  token: string,
+  tokenSecret: string,
+  verifier: string,
+): Promise<string | Buffer> => {
+  return new Promise((resolve, reject) => {
+    oauth.getOAuthAccessToken(
       token,
       tokenSecret,
-      JSON.stringify(results),
-    );
+      verifier,
+      (error, accessToken, accessTokenSecret, results) => {
+        if (error) {
+          console.error('===>AUTH ERROR', error);
+          reject(error);
+          return;
+        }
 
-    oauth_secrets[token] = tokenSecret;
-    ctx.redirect(
-      `${authorizeURL}?oauth_token=${token}&name=${appName}&scope=${scope}&expiration=${expiration}`,
+        console.log('==>Auth results', results);
+        // In a real app, the accessToken and accessTokenSecret should be stored
+        oauth.getProtectedResource(
+          'https://api.trello.com/1/members/me',
+          'GET',
+          accessToken,
+          accessTokenSecret,
+          (error, data, response) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+
+            console.log('===>ERROR', error);
+            console.log('===>RESPONSE', response);
+
+            console.log(accessToken);
+            console.log(accessTokenSecret);
+
+            resolve(data);
+          },
+        );
+      },
     );
   });
 };
 
-const callback = function(ctx: Koa.Context) {
+// handlers
+const login = async function(ctx: Koa.Context) {
+  const { token, tokenSecret } = await getRequestToken();
+  oauth_secrets[token] = tokenSecret;
+  await ctx.redirect(
+    `${authorizeURL}?oauth_token=${token}&name=${appName}&scope=${scope}&expiration=${expiration}`,
+  );
+};
+
+const callback = async (ctx: Koa.Context) => {
   const query = url.parse(ctx.req.url, true).query;
   const token = <string>query.oauth_token;
   const tokenSecret = oauth_secrets[token];
   const verifier = <string>query.oauth_verifier;
-  oauth.getOAuthAccessToken(
-    token,
-    tokenSecret,
-    verifier,
-    (error, accessToken, accessTokenSecret, results) => {
-      if (error) {
-        console.error('===>AUTH ERROR', error);
-        return;
-      }
-
-      console.log('==>Auth results', results);
-      // In a real app, the accessToken and accessTokenSecret should be stored
-      oauth.getProtectedResource(
-        'https://api.trello.com/1/members/me',
-        'GET',
-        accessToken,
-        accessTokenSecret,
-        (error, data, response) => {
-          console.log('===>ERROR', error);
-          console.log('===>RESPONSE', response);
-
-          console.log(accessToken);
-          console.log(accessTokenSecret);
-          ctx.body = data;
-        },
-      );
-    },
-  );
+  const data = await getAccessToken(token, tokenSecret, verifier);
+  ctx.body = data;
 };
 
 // Routes
