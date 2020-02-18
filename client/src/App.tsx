@@ -24,7 +24,7 @@ const App = () => {
             variant="contained"
             color="primary"
             onClick={() => {
-              window.Trello.authorize({
+              Trello.authorize({
                 type: 'popup',
                 name: 'Getting Started Application',
                 scope: {
@@ -37,7 +37,22 @@ const App = () => {
               });
             }}
           >
-            Primary
+            Auth
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={async () => {
+              const { username } = await Trello.members.get('me');
+              const boards = await Trello.members.get(`${username}/boards`, {
+                filter: 'open',
+                fields: 'id,name,desc',
+              });
+              console.log('===>All Boards', boards);
+              // https://hooks.glip.com/webhook/3019f897-2ec4-444b-84e5-8875be4ee024
+            }}
+          >
+            List all
           </Button>
         </div>
       </header>

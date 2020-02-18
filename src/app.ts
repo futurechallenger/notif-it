@@ -137,6 +137,17 @@ router.get('/callback', async (ctx: Koa.Context) => {
   await callback(ctx);
 });
 
+router.head('/trello/hook', async (ctx: Koa.Context) => {
+  ctx.status = 200;
+  ctx.body = {};
+});
+
+router.post('/trello/hook', async (ctx: Koa.Context) => {
+  console.log('===>HOOK', JSON.stringify(ctx.request));
+  ctx.status = 200;
+  ctx.body = {};
+});
+
 // APP
 const app = new Koa();
 const clientPath =
