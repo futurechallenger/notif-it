@@ -7,6 +7,7 @@ import * as path from 'path';
 import { OAuth } from 'oauth';
 import * as url from 'url';
 import * as bodyParser from 'koa-bodyparser';
+import Axios from 'axios';
 
 dotenv.config();
 
@@ -129,6 +130,8 @@ const callback = async (ctx: Koa.Context) => {
   ctx.body = data;
 };
 
+let messageHook = '';
+
 // Routes
 const router = new Router();
 router.get('/login', async (ctx: Koa.Context) => {
@@ -136,6 +139,17 @@ router.get('/login', async (ctx: Koa.Context) => {
 });
 router.get('/callback', async (ctx: Koa.Context) => {
   await callback(ctx);
+});
+
+router.post('/message/hook', async (ctx: Koa.Context) => {
+  const { hook } = ctx.request.body;
+  messageHook =
+    hook ||
+    'https://hooks.glip.com/webhook/7d660f28-260d-4cb1-a8d2-c2591da0fbcb';
+
+  ctx.body = {
+    message: 'OK',
+  };
 });
 
 router.head('/trello/hook', async (ctx: Koa.Context) => {
@@ -147,8 +161,31 @@ router.post('/trello/hook', async (ctx: Koa.Context) => {
   console.log('===>HOOK', JSON.stringify(ctx.request));
   console.log('===>HOOK BODY', JSON.stringify(ctx.request.body));
 
-  ctx.status = 200;
-  ctx.body = {};
+  try {
+    const {
+      model: { name = ' error model' },
+      action: { type = 'error action' },
+    } = ctx.request.body;
+
+    if (messageHook) {
+      console.log('===>Glip Hook', messageHook);
+
+      const ret = await Axios.post(
+        messageHook,
+        JSON.stringify({
+          title: `***${name}***`,
+          text: `Action: ${type}`,
+        }),
+      );
+
+      console.log('===>POST RET', ret);
+    }
+
+    ctx.status = 200;
+    ctx.body = {};
+  } catch (e) {
+    ctx.throw(500, { message: e.message });
+  }
 });
 
 // APP
