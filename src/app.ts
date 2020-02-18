@@ -6,6 +6,7 @@ import * as Router from 'koa-router';
 import * as path from 'path';
 import { OAuth } from 'oauth';
 import * as url from 'url';
+import * as bodyParser from 'koa-bodyparser';
 
 dotenv.config();
 
@@ -144,6 +145,8 @@ router.head('/trello/hook', async (ctx: Koa.Context) => {
 
 router.post('/trello/hook', async (ctx: Koa.Context) => {
   console.log('===>HOOK', JSON.stringify(ctx.request));
+  console.log('===>HOOK BODY', JSON.stringify(ctx.request.body));
+
   ctx.status = 200;
   ctx.body = {};
 });
@@ -154,6 +157,7 @@ const clientPath =
   process.env.NODE_ENV === 'dev' ? '../client/build' : './client';
 app.use(serve(path.join(__dirname, clientPath)));
 app.use(cors());
+app.use(bodyParser());
 
 app.use(router.routes());
 
