@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import { AuthButton } from './AuthButton';
+import { BoardsList } from './BoradsList';
 
 const App = () => {
   return (
@@ -13,7 +14,6 @@ const App = () => {
             style={{
               display: 'flex',
               justifyContent: 'space-around',
-              width: '300px',
             }}
           >
             <Switch>
@@ -21,7 +21,7 @@ const App = () => {
                 <AuthButton title="Auth" />
               </Route>
               <Route path="/content">
-                <Button
+                {/* <Button
                   variant="contained"
                   color="secondary"
                   onClick={async () => {
@@ -38,7 +38,8 @@ const App = () => {
                   }}
                 >
                   List all
-                </Button>
+                </Button> */}
+                <BoardsList />
               </Route>
             </Switch>
           </div>
