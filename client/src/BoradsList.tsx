@@ -1,21 +1,22 @@
 import React, { useEffect, useReducer } from 'react';
+import { filter, indexOf } from 'lodash';
 import {
   makeStyles,
   GridList,
   GridListTile,
   Checkbox,
 } from '@material-ui/core';
+import { BoardType, BoardCheckbox } from './BoardCheckbox';
 import { useImmerReducer } from 'use-immer';
-
-type BoardType = {
-  name: string;
-  desc: string;
-  id: string;
-};
 
 type ActionType = {
   boards: BoardType[];
   type: string;
+};
+
+type SelectActionType = {
+  board: string;
+  type: 'TOGGLE' | 'RESET';
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -40,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const boardsReducer = (boards: BoardType[] = [], action: ActionType) => {
+const boardsReducer = (boards: BoardType[], action: ActionType) => {
   switch (action.type) {
     case 'FETCH_DONE': {
       // boards = action.boards || [];
@@ -56,10 +57,35 @@ const boardsReducer = (boards: BoardType[] = [], action: ActionType) => {
   }
 };
 
+const selectedBoardsReducer = (
+  selectedBoards: string[],
+  action: SelectActionType,
+) => {
+  switch (action.type) {
+    case 'TOGGLE':
+      const exists = indexOf(selectedBoards, action.board) >= 0;
+      let boards: string[] = selectedBoards;
+      if (exists) {
+        boards = filter(boards, (e: string) => action.board !== e);
+      } else {
+        boards.push(action.board);
+      }
+      return [...boards];
+    case 'RESET':
+      return [];
+    default:
+      return selectedBoards;
+  }
+};
+
 const BoardsList = () => {
   const classes = useStyles();
   // const [boards, dispatch] = useImmerReducer(boardsReducer, []);
   const [boards, dispatch] = useReducer(boardsReducer, []);
+  const [selectedBoards, dispatchSelected] = useReducer(
+    selectedBoardsReducer,
+    [],
+  );
   useEffect(() => {
     const fetchBoards = async () => {
       try {
@@ -78,17 +104,22 @@ const BoardsList = () => {
 
     fetchBoards();
   }, []);
+
+  // Select/Unselect boards
+  const handleSelect = (boardId: string) => {
+    dispatchSelected({ type: 'TOGGLE', board: boardId });
+  };
+
   return (
     <div className={classes.root}>
       <GridList cellHeight={60} className={classes.gridList} cols={2}>
-        {boards.map(({ id, name, desc }) => (
-          <GridListTile className={classes.gridChild} key={id} cols={1}>
-            {
-              <>
-                <Checkbox />
-                <span>{`${name} ## ${desc}`}</span>
-              </>
-            }
+        {boards.map((b: BoardType) => (
+          <GridListTile className={classes.gridChild} key={b.id} cols={1}>
+            <BoardCheckbox
+              board={b}
+              selected={selectedBoards}
+              handleSelect={handleSelect}
+            />
           </GridListTile>
         ))}
       </GridList>
