@@ -1,13 +1,9 @@
 import React, { useEffect, useReducer } from 'react';
 import { filter, indexOf } from 'lodash';
-import {
-  makeStyles,
-  GridList,
-  GridListTile,
-  Checkbox,
-} from '@material-ui/core';
+import { makeStyles, GridList, GridListTile, Button } from '@material-ui/core';
 import { BoardType, BoardCheckbox } from './BoardCheckbox';
 import { useImmerReducer } from 'use-immer';
+import { subscribeEvents } from './services/subscribeEvents';
 
 type ActionType = {
   boards: BoardType[];
@@ -26,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     overflow: 'hidden',
     width: '80%',
+    height: '90%',
     backgroundColor: theme.palette.background.default,
   },
   gridList: {
@@ -110,6 +107,11 @@ const BoardsList = () => {
     dispatchSelected({ type: 'TOGGLE', board: boardId });
   };
 
+  // Subscribe events
+  const handleSubscribe = () => {
+    subscribeEvents(selectedBoards);
+  };
+
   return (
     <div className={classes.root}>
       <GridList cellHeight={60} className={classes.gridList} cols={2}>
@@ -123,6 +125,9 @@ const BoardsList = () => {
           </GridListTile>
         ))}
       </GridList>
+      <Button variant="outlined" color="primary" onClick={handleSubscribe}>
+        Save
+      </Button>
     </div>
   );
 };
