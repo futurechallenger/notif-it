@@ -1,62 +1,51 @@
 import { Button } from '@material-ui/core';
 import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
-import logo from './logo.svg';
+import { AuthButton } from './AuthButton';
+import { BoardsList } from './BoradsList';
 
 const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="./login"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <div>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              Trello.authorize({
-                type: 'popup',
-                name: 'Getting Started Application',
-                scope: {
-                  read: 'true',
-                  write: 'true',
-                },
-                expiration: 'never',
-                success: (v: any) => console.log('===>Success', v),
-                error: (e: any) => console.log('===>Err', e),
-              });
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-around',
             }}
           >
-            Auth
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={async () => {
-              const { username } = await Trello.members.get('me');
-              const boards = await Trello.members.get(`${username}/boards`, {
-                filter: 'open',
-                fields: 'id,name,desc',
-              });
-              console.log('===>All Boards', boards);
-              // https://hooks.glip.com/webhook/3019f897-2ec4-444b-84e5-8875be4ee024
-            }}
-          >
-            List all
-          </Button>
-        </div>
-      </header>
-    </div>
+            <Switch>
+              <Route exact path="/">
+                <AuthButton title="Auth" />
+              </Route>
+              <Route path="/content">
+                {/* <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={async () => {
+                    const { username } = await Trello.members.get('me');
+                    const boards = await Trello.members.get(
+                      `${username}/boards`,
+                      {
+                        filter: 'open',
+                        fields: 'id,name,desc',
+                      },
+                    );
+                    console.log('===>All Boards', boards);
+                    // https://hooks.glip.com/webhook/3019f897-2ec4-444b-84e5-8875be4ee024
+                  }}
+                >
+                  List all
+                </Button> */}
+                <BoardsList />
+              </Route>
+            </Switch>
+          </div>
+        </header>
+      </div>
+    </Router>
   );
 };
 

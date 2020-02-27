@@ -12,6 +12,7 @@
     "start": "node build/app.js"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "dotenv": "^8.2.0",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
@@ -22,6 +23,7 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/dotenv": "^8.2.0",
     "@types/koa": "^2.11.1",
     "@types/koa-bodyparser": "^4.3.0",
