@@ -17,6 +17,7 @@
     "alwaysStrict": true,
     "strict": false,
     "baseUrl": ".",
+    // "rootDir": ".", // Key to keep the directory structure in build
     "outDir": "./build"
     // "paths": {
     //   "@lib/*": ["lib/*"],

@@ -1,11 +1,18 @@
 import { Button } from '@material-ui/core';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import { AuthButton } from './AuthButton';
 import { BoardsList } from './BoradsList';
+import { RouterButton } from './components/RouterButton';
 
 const App = () => {
+  const [windowState, setWindowState] = useState('closed');
+  useEffect(() => {
+    if (windowState === 'closed') {
+      const w = window.open('url', 'auth', 'wi');
+    }
+  }, [windowState]);
   return (
     <Router>
       <div className="App">
@@ -18,7 +25,10 @@ const App = () => {
           >
             <Switch>
               <Route exact path="/">
-                <AuthButton title="Auth" />
+                <>
+                  <AuthButton title="Auth" />
+                  <RouterButton title="Auth by Server" handleClick={() => {}} />
+                </>
               </Route>
               <Route path="/content">
                 {/* <Button

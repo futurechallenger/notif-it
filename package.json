@@ -9,31 +9,43 @@
   "scripts": {
     "postinstall": "sh ./scripts/postinstall.sh",
     "build:server": "tsc -p .",
-    "start": "node build/app.js"
+    "start": "node build/app.js",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
-    "koa": "^2.11.0",
-    "koa-bodyparser": "^4.2.1",
-    "koa-cors": "^0.0.16",
-    "koa-router": "^8.0.8",
-    "koa-static": "^5.0.0",
+    "ejs": "^3.0.1",
+    "express": "^4.17.1",
     "oauth": "^0.9.15",
     "url": "^0.11.0"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
+    "@types/body-parser": "^1.19.0",
+    "@types/cors": "^2.8.6",
     "@types/dotenv": "^8.2.0",
-    "@types/koa": "^2.11.1",
-    "@types/koa-bodyparser": "^4.3.0",
-    "@types/koa-cors": "^0.0.0",
-    "@types/koa-router": "^7.4.0",
-    "@types/koa-static": "^4.0.1",
+    "@types/ejs": "^3.0.1",
+    "@types/express": "^4.17.2",
     "@types/oauth": "^0.9.1",
+    "husky": "^4.2.3",
     "jest": "^25.1.0",
+    "lint-staged": "^10.0.8",
     "ts-jest": "^25.2.0",
     "ts-node": "^8.6.2",
     "typescript": "^3.7.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,less,md,json}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
