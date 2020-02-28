@@ -20,7 +20,7 @@
     />
     <link rel="manifest" href="/manifest.json" />
     <script>
-      window._external_url = '<%= url %>';
+      window._external_url = '<%= url %>'.split('amp;').join('');
       document.title = '<%= title %>';
     </script>
     <title>Notification App</title>
