@@ -130,12 +130,13 @@ router.get('/login', async (_: Request, res: Response) => {
   );
 });
 router.get('/callback', async (req: Request, res: Response) => {
-  const query = url.parse(req.url, true).query;
-  const token = <string>query.oauth_token;
-  const tokenSecret = oauth_secrets[token];
-  const verifier = <string>query.oauth_verifier;
-  const data = await getAccessToken(token, tokenSecret, verifier);
-  res.json(data);
+  res.json(JSON.stringify(req.body));
+  // const query = url.parse(req.url, true).query;
+  // const token = <string>query.oauth_token;
+  // const tokenSecret = oauth_secrets[token];
+  // const verifier = <string>query.oauth_verifier;
+  // const data = await getAccessToken(token, tokenSecret, verifier);
+  // res.json(data);
 });
 
 router.post('/message/hook', async (req: Request, res: Response) => {
