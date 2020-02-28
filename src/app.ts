@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import * as Express from 'express';
+import * as compression from 'compression';
 import * as bodyParser from 'body-parser';
 // import * as serve from 'koa-static';
 import * as cors from 'cors';
@@ -15,16 +16,17 @@ const app = Express();
 // View engine
 const clientPath = '../views';
 // process.env.NODE_ENV === 'dev' ? '../views' : './client';
-app.set('html', ejs.renderFile);
-app.set('view engine', 'ejs');
+app.engine('html', ejs.renderFile);
+app.set('view engine', 'html');
 app.set('views', path.join(__dirname, clientPath));
+app.use(
+  Express.static(path.join(__dirname, clientPath), { maxAge: 31557600000 }),
+);
 
 // Middleware
 app.use(cors());
 app.use(bodyParser());
-app.use(
-  Express.static(path.join(__dirname, clientPath), { maxAge: 31557600000 }),
-);
+app.use(compression());
 
 // routes
 app.use(router);

@@ -11,9 +11,12 @@ import {
   requestURL,
   scope,
 } from './config';
+import * as dotenv from 'dotenv';
 
 type Request = Express.Request;
 type Response = Express.Response;
+
+dotenv.config();
 
 const router = Express.Router();
 
@@ -111,10 +114,11 @@ const getAccessToken = (
 
 let messageHook = '';
 
+// TODO: replace key with env var
 router.get('/', (_: Request, res: Response) => {
   res.render('home', {
     title: 'Trello Notification App',
-    url: 'https://apple.com',
+    url: `https://trello.com/1/authorize?expiration=1day&name=MyPersonalToken&scope=read&response_type=token&key=${process.env.TRELLO_KEY}`,
   });
 });
 
