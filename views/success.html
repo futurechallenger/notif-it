@@ -45,7 +45,8 @@
         window.opener.focus();
 
         if (window.opener.callback) {
-          window.opener.callback();
+          var hash = window.location.hash;
+          window.opener.callback(hash.split('=')[1]);
         }
       }
 

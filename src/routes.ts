@@ -113,13 +113,25 @@ const getAccessToken = (
 };
 
 let messageHook = '';
+let token = '';
 
 // TODO: replace key with env var
 router.get('/', (_: Request, res: Response) => {
-  res.render('home', {
-    title: 'Trello Notification App',
-    url: `https://trello.com/1/authorize?expiration=1day&name=MyPersonalToken&scope=read&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${process.env.PROJECT_DOMAIN}/callback`,
-  });
+  const host =
+    process.env.NODE_ENV === 'dev'
+      ? 'http://localhost:8333'
+      : process.env.PROJECT_DOMAIN;
+
+  if (!token) {
+    res.render('home', {
+      title: 'Trello Notification App',
+      url: `https://trello.com/1/authorize?expiration=1day&name=MyPersonalToken&scope=read&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`,
+      host,
+    });
+    return;
+  }
+
+  res.render('../client/build/index.html');
 });
 
 router.get('/login', async (_: Request, res: Response) => {
@@ -131,20 +143,20 @@ router.get('/login', async (_: Request, res: Response) => {
 });
 
 // Auth callback url
-router.get('/callback', async (req: Request, _: Response) => {
-  console.log(
-    '==>Callback',
-    JSON.stringify(req),
-    JSON.stringify(req.body),
-    req.query,
-  );
-  // res.redirect('/success.html');
-  // const query = url.parse(req.url, true).query;
-  // const token = <string>query.oauth_token;
-  // const tokenSecret = oauth_secrets[token];
-  // const verifier = <string>query.oauth_verifier;
-  // const data = await getAccessToken(token, tokenSecret, verifier);
-  // res.json(data);
+router.get('/callback', async (req: Request, res: Response) => {
+  console.log('==>Callback', req.query);
+  res.redirect('/success.html');
+});
+
+router.post('/callback', (req: Request, res: Response) => {
+  try {
+    const { t } = req.body;
+    // TODO: Store token here
+    token = t;
+    res.json({ message: 'OK' });
+  } catch (e) {
+    res.status(500).json({ message: 'Failed' });
+  }
 });
 
 router.post('/message/hook', async (req: Request, res: Response) => {
