@@ -9,6 +9,7 @@
   "scripts": {
     "postinstall": "sh ./scripts/postinstall.sh",
     "build:server": "tsc -p .",
+    "build:client": "sh ./scripts/build_client.sh",
     "start": "node build/app.js",
     "lint-staged": "lint-staged"
   },

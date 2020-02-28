@@ -20,7 +20,7 @@ app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 app.set('views', path.join(__dirname, clientPath));
 app.use(
-  Express.static(path.join(__dirname, '../client/build'), {
+  Express.static(path.join(__dirname, clientPath), {
     maxAge: 31557600000,
   }),
 );

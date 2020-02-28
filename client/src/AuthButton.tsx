@@ -1,6 +1,8 @@
 import React from 'react';
 import { RouterButton } from './components/RouterButton';
 import { useHistory } from 'react-router-dom';
+import { host, authUrl } from './util/config';
+import Axios from 'axios';
 
 interface AuthButtonProps {
   title: string;
@@ -9,21 +11,28 @@ interface AuthButtonProps {
 const AuthButton: React.FunctionComponent<AuthButtonProps> = ({ title }) => {
   const history = useHistory();
 
+  const w = window as any;
+  if (!w.callback) {
+    const callback = (param: string) => {
+      if (!param) {
+        console.error('ERROR: param is invalid!');
+        return;
+      }
+
+      try {
+        const ret = Axios.post(`${host}/callback`, { t: param });
+        console.log('token', ret);
+        history.replace('/content');
+      } catch (e) {
+        console.error('error', e);
+      }
+    };
+
+    w.callback = callback;
+  }
+
   const onClick = () => {
-    Trello.authorize({
-      type: 'popup',
-      name: 'Getting Started Application',
-      scope: {
-        read: 'true',
-        write: 'true',
-      },
-      expiration: 'never',
-      success: (v: any) => {
-        console.log('===>Success', v);
-        history.push('/content');
-      },
-      error: (e: any) => console.log('===>Err', e),
-    });
+    window.open(authUrl);
   };
 
   return <RouterButton handleClick={onClick} title={title} />;
