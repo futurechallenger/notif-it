@@ -131,8 +131,9 @@ router.get('/login', async (_: Request, res: Response) => {
 });
 
 // Auth callback url
-router.post('/callback', async (req: Request, res: Response) => {
-  res.json(JSON.stringify(req.body));
+router.get('/callback', async (req: Request, res: Response) => {
+  console.log('==>Callback', JSON.stringify(req.body), req.query);
+  res.redirect('/success.html');
   // const query = url.parse(req.url, true).query;
   // const token = <string>query.oauth_token;
   // const tokenSecret = oauth_secrets[token];
