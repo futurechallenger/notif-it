@@ -129,7 +129,9 @@ router.get('/login', async (_: Request, res: Response) => {
     `${authorizeURL}?oauth_token=${token}&name=${appName}&scope=${scope}&expiration=${expiration}`,
   );
 });
-router.get('/callback', async (req: Request, res: Response) => {
+
+// Auth callback url
+router.post('/callback', async (req: Request, res: Response) => {
   res.json(JSON.stringify(req.body));
   // const query = url.parse(req.url, true).query;
   // const token = <string>query.oauth_token;
