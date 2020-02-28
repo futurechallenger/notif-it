@@ -118,7 +118,7 @@ let messageHook = '';
 router.get('/', (_: Request, res: Response) => {
   res.render('home', {
     title: 'Trello Notification App',
-    url: `https://trello.com/1/authorize?expiration=1day&name=MyPersonalToken&scope=read&response_type=token&key=${process.env.TRELLO_KEY}`,
+    url: `https://trello.com/1/authorize?expiration=1day&name=MyPersonalToken&scope=read&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${process.env.PROJECT_DOMAIN}/callback`,
   });
 });
 
