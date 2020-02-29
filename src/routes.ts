@@ -111,10 +111,28 @@ router.get('/events', async (_: Request, res: Response) => {
   }
 });
 
-router.post('/subscribe', (req: Request, res: Response) => {
-  const { events } = req.body;
-  console.log('==>Events', events);
-  res.json({ message: 'OK' });
+router.post('/subscribe', async (req: Request, res: Response) => {
+  try {
+    const { events } = req.body;
+    console.log('==>Events', events);
+
+    //TODO: check if db contains this team. if it does, upate. If not set the hook
+    // https://api.trello.com/1/webhooks/?idModel=5e4b4f2fd5d8d9070ad67c15&description="My Webhook"&callbackURL=https://j-int.herokuapp.com/trello/hook&key=bbe35d4f98acd015fe7204bcb80e5567&token=43777f0b40a7361a08c362a5c2b1c8bb4d6f5a8abe97326f10b5da51b78231b7
+    let promises = [];
+    if (events.length > 0) {
+      promises = events.map((eId: string) =>
+        Axios({
+          method: 'post',
+          url: `${trelloHost}webhooks/?idModel=${eId}&description="My Webhook"&callbackURL=${process.env.PROJECT_DOMAIN}/trello/hook&key=${process.env.TRELLO_KEY}&token=${token}`,
+        }),
+      );
+      const ret = await Promise.all(promises);
+    }
+
+    res.json({ message: 'OK' });
+  } catch (e) {
+    res.status(500).json({ message: 'Failed' });
+  }
 });
 
 router.head('/trello/hook', async (_: Request, res: Response) => {
@@ -132,7 +150,7 @@ router.post('/trello/hook', async (req: Request, res: Response) => {
     } = req.body;
 
     if (messageHook) {
-      console.log('===>Glip Hook', messageHook);
+      console.log('===>Hook', messageHook);
 
       const ret = await Axios.post(
         messageHook,
