@@ -3,6 +3,7 @@ import Axios from 'axios';
 import { OAuth } from 'oauth';
 import * as url from 'url';
 import {
+  trelloHost,
   accessURL,
   appName,
   authorizeURL,
@@ -48,7 +49,7 @@ const host =
   process.env.NODE_ENV === 'dev'
     ? 'http://localhost:8333'
     : process.env.PROJECT_DOMAIN;
-const authUrl = `https://trello.com/1/authorize?expiration=1day&name=MyPersonalToken&scope=read&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
+const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
 
 // TODO: replace key with env var
 router.get('/', (_: Request, res: Response) => {
@@ -85,15 +86,29 @@ router.post('/callback', (req: Request, res: Response) => {
   }
 });
 
-router.post('/message/hook', async (req: Request, res: Response) => {
-  const { hook } = req.body;
-  messageHook =
-    hook ||
-    'https://hooks.glip.com/webhook/7d660f28-260d-4cb1-a8d2-c2591da0fbcb';
+router.get('/events', async (_: Request, res: Response) => {
+  try {
+    // Get user info
+    const userInfoURI = `${trelloHost}members/me?key=${process.env.TRELLO_KEY}&token=${token}`;
+    let userInfo = await Axios.get(userInfoURI);
+    if (userInfo.status !== 200) {
+      throw new Error('Get userinfo error');
+    }
 
-  res.json({
-    message: 'OK',
-  });
+    // Get boards
+    const boardsURI = `${trelloHost}/members/${userInfo.data.username}/boards?key=${process.env.TRELLO_KEY}&token=${token}&filter=open&fields=id,name,desc`;
+    const boardsInfo = await Axios.get(boardsURI);
+    if (boardsInfo.status !== 200) {
+      throw new Error('Get boards error');
+    }
+
+    res.json({
+      message: 'OK',
+      data: boardsInfo.data,
+    });
+  } catch (e) {
+    res.status(500).json({ message: 'Failed' });
+  }
 });
 
 router.head('/trello/hook', async (_: Request, res: Response) => {

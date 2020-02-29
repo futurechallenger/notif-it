@@ -1,3 +1,4 @@
+const trelloHost = 'https://trello.com/1/';
 const requestURL = 'https://trello.com/1/OAuthGetRequestToken';
 const accessURL = 'https://trello.com/1/OAuthGetAccessToken';
 const authorizeURL = 'https://trello.com/1/OAuthAuthorizeToken';
@@ -7,6 +8,7 @@ const expiration = '1hour';
 const loginCallback = `https://${process.env.PROJECT_DOMAIN}/callback`;
 
 export {
+  trelloHost,
   requestURL,
   accessURL,
   authorizeURL,
