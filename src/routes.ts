@@ -111,6 +111,12 @@ router.get('/events', async (_: Request, res: Response) => {
   }
 });
 
+router.post('/subscribe', (req: Request, res: Response) => {
+  const { events } = req.body;
+  console.log('==>Events', events);
+  res.json({ message: 'OK' });
+});
+
 router.head('/trello/hook', async (_: Request, res: Response) => {
   res.status(200).json({ message: 'OK' });
 });
