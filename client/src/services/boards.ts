@@ -8,6 +8,7 @@ async function getBoardsList() {
     return;
   }
 
+  console.log('===>Boards', data.data);
   return data.data;
 }
 

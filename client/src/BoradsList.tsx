@@ -88,7 +88,7 @@ const BoardsList = () => {
     const fetchBoards = async () => {
       try {
         const boards = await getBoardsList();
-
+        console.log('==>effect boards', boards);
         dispatch({ type: 'FETCH_DONE', boards });
       } catch (e) {
         console.error(e);
