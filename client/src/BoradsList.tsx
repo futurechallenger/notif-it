@@ -4,6 +4,7 @@ import { makeStyles, GridList, GridListTile, Button } from '@material-ui/core';
 import { BoardType, BoardCheckbox } from './BoardCheckbox';
 import { useImmerReducer } from 'use-immer';
 import { subscribeEvents } from './services/subscribeEvents';
+import { getBoardsList } from './services/boards';
 
 type ActionType = {
   boards: BoardType[];
@@ -86,11 +87,7 @@ const BoardsList = () => {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const { username } = await Trello.members.get('me');
-        const boards = await Trello.members.get(`${username}/boards`, {
-          filter: 'open',
-          fields: 'id,name,desc',
-        });
+        const boards = await getBoardsList();
 
         dispatch({ type: 'FETCH_DONE', boards });
       } catch (e) {
