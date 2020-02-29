@@ -1,9 +1,5 @@
 import Axios from 'axios';
-
-const host =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:8333'
-    : 'https://j-int.herokuapp.com'; // TODO: request trello to get boards
+import { host } from '../util/config';
 
 async function getBoardsList() {
   const { status, data } = await Axios.get(`${host}/events`);
