@@ -1,6 +1,7 @@
 #!/bin/sh
 
-rm -rf ./views/build 
+rm -rf ./views 
+mkdir ./views
 
 cd client
 yarn install
@@ -9,3 +10,4 @@ cd ../
 
 # cp -r client/build build/client
 cp -r client/build/ views
+cp -r resources/ views
