@@ -8,7 +8,7 @@ async function getBoardsList() {
     return;
   }
 
-  return data;
+  return data.data;
 }
 
 export { getBoardsList };
