@@ -62,7 +62,7 @@ router.get('/', (_: Request, res: Response) => {
   //   return;
   // }
 
-  res.render('../views/build/index.html');
+  res.render('index');
 });
 
 router.get('/auth', async (_: Request, res: Response) => {
