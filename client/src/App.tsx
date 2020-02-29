@@ -8,11 +8,7 @@ import { RouterButton } from './components/RouterButton';
 
 const App = () => {
   const [windowState, setWindowState] = useState('closed');
-  useEffect(() => {
-    if (windowState === 'closed') {
-      const w = window.open('url', 'auth', 'wi');
-    }
-  }, [windowState]);
+  // useEffect(() => {}, [windowState]);
   return (
     <Router>
       <div className="App">
@@ -25,30 +21,9 @@ const App = () => {
           >
             <Switch>
               <Route exact path="/">
-                <>
-                  <AuthButton title="Auth" />
-                  <RouterButton title="Auth by Server" handleClick={() => {}} />
-                </>
+                <AuthButton title="Auth" />
               </Route>
               <Route path="/content">
-                {/* <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={async () => {
-                    const { username } = await Trello.members.get('me');
-                    const boards = await Trello.members.get(
-                      `${username}/boards`,
-                      {
-                        filter: 'open',
-                        fields: 'id,name,desc',
-                      },
-                    );
-                    console.log('===>All Boards', boards);
-                    // https://hooks.glip.com/webhook/3019f897-2ec4-444b-84e5-8875be4ee024
-                  }}
-                >
-                  List all
-                </Button> */}
                 <BoardsList />
               </Route>
             </Switch>

@@ -3,6 +3,7 @@ import Axios from 'axios';
 import { OAuth } from 'oauth';
 import * as url from 'url';
 import {
+  trelloHost,
   accessURL,
   appName,
   authorizeURL,
@@ -41,105 +42,31 @@ interface RequestToken {
   results: any[];
 }
 
-const getRequestToken = (): Promise<RequestToken> => {
-  return new Promise((resolve, reject) => {
-    oauth.getOAuthRequestToken((error, token, tokenSecret, results) => {
-      console.log(
-        '===>LOGIN INFO',
-        JSON.stringify({
-          error,
-          token,
-          tokenSecret,
-          results,
-        }),
-      );
-
-      if (error) {
-        reject(error);
-        return;
-      }
-
-      resolve({
-        token,
-        tokenSecret,
-        results,
-      });
-    });
-  });
-};
-
-const getAccessToken = (
-  token: string,
-  tokenSecret: string,
-  verifier: string,
-): Promise<string | Buffer> => {
-  return new Promise((resolve, reject) => {
-    oauth.getOAuthAccessToken(
-      token,
-      tokenSecret,
-      verifier,
-      (error, accessToken, accessTokenSecret, results) => {
-        if (error) {
-          console.error('===>AUTH ERROR', error);
-          reject(error);
-          return;
-        }
-
-        console.log('==>Auth results', results);
-        // In a real app, the accessToken and accessTokenSecret should be stored
-        oauth.getProtectedResource(
-          'https://api.trello.com/1/members/me',
-          'GET',
-          accessToken,
-          accessTokenSecret,
-          (error, data, response) => {
-            if (error) {
-              reject(error);
-              return;
-            }
-
-            console.log('===>ERROR', error);
-            console.log('===>RESPONSE', response);
-
-            console.log(accessToken);
-            console.log(accessTokenSecret);
-
-            resolve(data);
-          },
-        );
-      },
-    );
-  });
-};
-
 let messageHook = '';
 let token = '';
 
+const host =
+  process.env.NODE_ENV === 'dev'
+    ? 'http://localhost:8333'
+    : process.env.PROJECT_DOMAIN;
+const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
+
 // TODO: replace key with env var
 router.get('/', (_: Request, res: Response) => {
-  const host =
-    process.env.NODE_ENV === 'dev'
-      ? 'http://localhost:8333'
-      : process.env.PROJECT_DOMAIN;
+  // if (!token) {
+  //   res.render('home', {
+  //     title: 'Trello Notification App',
+  //     url: authUrl,
+  //     host,
+  //   });
+  //   return;
+  // }
 
-  if (!token) {
-    res.render('home', {
-      title: 'Trello Notification App',
-      url: `https://trello.com/1/authorize?expiration=1day&name=MyPersonalToken&scope=read&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`,
-      host,
-    });
-    return;
-  }
-
-  res.render('../client/build/index.html');
+  res.render('../views/build/index.html');
 });
 
-router.get('/login', async (_: Request, res: Response) => {
-  const { token, tokenSecret } = await getRequestToken();
-  oauth_secrets[token] = tokenSecret;
-  res.redirect(
-    `${authorizeURL}?oauth_token=${token}&name=${appName}&scope=${scope}&expiration=${expiration}`,
-  );
+router.get('/auth', async (_: Request, res: Response) => {
+  res.redirect(authUrl);
 });
 
 // Auth callback url
@@ -159,15 +86,29 @@ router.post('/callback', (req: Request, res: Response) => {
   }
 });
 
-router.post('/message/hook', async (req: Request, res: Response) => {
-  const { hook } = req.body;
-  messageHook =
-    hook ||
-    'https://hooks.glip.com/webhook/7d660f28-260d-4cb1-a8d2-c2591da0fbcb';
+router.get('/events', async (_: Request, res: Response) => {
+  try {
+    // Get user info
+    const userInfoURI = `${trelloHost}members/me?key=${process.env.TRELLO_KEY}&token=${token}`;
+    let userInfo = await Axios.get(userInfoURI);
+    if (userInfo.status !== 200) {
+      throw new Error('Get userinfo error');
+    }
 
-  res.json({
-    message: 'OK',
-  });
+    // Get boards
+    const boardsURI = `${trelloHost}/members/${userInfo.data.username}/boards?key=${process.env.TRELLO_KEY}&token=${token}&filter=open&fields=id,name,desc`;
+    const boardsInfo = await Axios.get(boardsURI);
+    if (boardsInfo.status !== 200) {
+      throw new Error('Get boards error');
+    }
+
+    res.json({
+      message: 'OK',
+      data: boardsInfo.data,
+    });
+  } catch (e) {
+    res.status(500).json({ message: 'Failed' });
+  }
 });
 
 router.head('/trello/hook', async (_: Request, res: Response) => {
