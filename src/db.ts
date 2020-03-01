@@ -36,17 +36,17 @@ async function query(sql: string, values?: any[]): Promise<any | undefined> {
       ret = await pool.query(sql, values);
     }
     console.log('==>Query: ', ret.rows[0]);
-    return ret.rows[0];
+    return ret;
   } catch (e) {
     console.error('ERROR', e);
     return undefined;
   }
 }
 
-async function getTeamToken(teamId: string): Promise<string | undefined> {
+async function getTeamToken(teamId: string): Promise<any | null> {
   const ret = await query('select tk from team where teamId=$1', [teamId]);
   console.log('GET TOKEN ret: ', ret);
-  return ret;
+  return ret.rowCount > 0 ? ret.rows[0] : null;
 }
 
 async function storeToken(teamId: string, token: string): Promise<number> {
@@ -87,7 +87,7 @@ async function storeEnvets(teamId: string, events: string[]): Promise<number> {
     [events.join(','), +moment.utc().format('X'), teamId],
   );
 
-  return !ret ? -1 : 1;
+  return ret.rowCount;
 }
 
 export { query, storeToken, storeEnvets, getTeamToken };
