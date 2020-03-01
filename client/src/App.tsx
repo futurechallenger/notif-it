@@ -9,7 +9,7 @@ const App = () => {
   // TODO: Team ID may from a part of a url
   useEffect(() => {
     const parsed = qs.parse(window.location.href);
-    const teamId = parsed[Object.keys(parsed)[0]];
+    const teamId = parsed[Object.keys(parsed)[0]].replace('#/', '');
     localStorage.setItem('__teamId', teamId);
   }, []);
   return (
