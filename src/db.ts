@@ -35,7 +35,7 @@ async function query(sql: string, values?: any[]): Promise<any | undefined> {
     } else {
       ret = await pool.query(sql, values);
     }
-    console.log(ret.rows[0]);
+    console.log('==>Query: ', ret.rows[0]);
     return ret.rows[0];
   } catch (e) {
     console.error('ERROR', e);
@@ -45,6 +45,7 @@ async function query(sql: string, values?: any[]): Promise<any | undefined> {
 
 async function getTeamToken(teamId: string): Promise<string | undefined> {
   const ret = await query('select tk from team where teamId=$1', [teamId]);
+  console.log('GET TOKEN ret: ', ret);
   return ret;
 }
 
