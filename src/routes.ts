@@ -13,6 +13,7 @@ import {
   scope,
 } from './config';
 import * as dotenv from 'dotenv';
+import { query } from './db';
 
 type Request = Express.Request;
 type Response = Express.Response;
@@ -25,28 +26,11 @@ const router = Express.Router();
 const key = process.env.TRELLO_KEY;
 const secret = process.env.TRELLO_SECRET;
 
-const oauth_secrets: { [key: string]: string } = {};
-const oauth = new OAuth(
-  requestURL,
-  accessURL,
-  key,
-  secret,
-  '1.0A',
-  loginCallback,
-  'HMAC-SHA1',
-);
-
-interface RequestToken {
-  token: string;
-  tokenSecret: string;
-  results: any[];
-}
-
 let messageHook = '';
 let token = '';
 
 const host =
-  process.env.NODE_ENV === 'dev'
+  process.env.NODE_ENV === 'development'
     ? 'http://localhost:8333'
     : process.env.PROJECT_DOMAIN;
 const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
@@ -111,6 +95,35 @@ router.get('/events', async (_: Request, res: Response) => {
   }
 });
 
+router.post('/subscribe', async (req: Request, res: Response) => {
+  try {
+    const { events } = req.body;
+    console.log('==>Events', events);
+
+    //TODO: check if db contains this team. if it does, upate. If not set the hook
+    // https://api.trello.com/1/webhooks/?idModel=5e4b4f2fd5d8d9070ad67c15&description="My Webhook"&callbackURL=https://j-int.herokuapp.com/trello/hook&key=bbe35d4f98acd015fe7204bcb80e5567&token=43777f0b40a7361a08c362a5c2b1c8bb4d6f5a8abe97326f10b5da51b78231b7
+    let promises = [];
+    if (events.length > 0) {
+      promises = events.map((eId: string) =>
+        Axios({
+          method: 'post',
+          url: `${trelloHost}webhooks/?idModel=${eId}&description="My Webhook"&callbackURL=${process.env.PROJECT_DOMAIN}/trello/hook&key=${process.env.TRELLO_KEY}&token=${token}`,
+        }),
+      );
+      const ret = await Promise.all(promises);
+    }
+
+    res.json({ message: 'OK' });
+  } catch (e) {
+    res.status(500).json({ message: 'Failed' });
+  }
+});
+
+router.get('/query', async (_: Request, res: Response) => {
+  const ret = await query('select now()');
+  res.json(ret);
+});
+
 router.head('/trello/hook', async (_: Request, res: Response) => {
   res.status(200).json({ message: 'OK' });
 });
@@ -126,7 +139,7 @@ router.post('/trello/hook', async (req: Request, res: Response) => {
     } = req.body;
 
     if (messageHook) {
-      console.log('===>Glip Hook', messageHook);
+      console.log('===>Hook', messageHook);
 
       const ret = await Axios.post(
         messageHook,

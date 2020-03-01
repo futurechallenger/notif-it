@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useCallback, useState } from 'react';
 import { filter, indexOf } from 'lodash';
 import { makeStyles, GridList, GridListTile, Button } from '@material-ui/core';
 import { BoardType, BoardCheckbox } from './BoardCheckbox';
@@ -105,9 +105,18 @@ const BoardsList = () => {
   };
 
   // Subscribe events
-  const handleSubscribe = () => {
-    subscribeEvents(selectedBoards);
-  };
+  const [subscribeStatus, setSubscribeStatus] = useState('none');
+
+  const handleSubscribe = useCallback(() => {
+    const subscribe = async () => {
+      setSubscribeStatus('subscribing');
+      const ret = await subscribeEvents(selectedBoards);
+      console.log('===>Sub ret', ret);
+      setSubscribeStatus('subscribed');
+    };
+
+    subscribe();
+  }, [selectedBoards]);
 
   return (
     <div className={classes.root}>
