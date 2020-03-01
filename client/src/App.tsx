@@ -1,14 +1,21 @@
-import { Button } from '@material-ui/core';
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import { AuthButton } from './AuthButton';
 import { BoardsList } from './BoradsList';
-import { RouterButton } from './components/RouterButton';
+import qs from 'qs';
 
 const App = () => {
-  const [windowState, setWindowState] = useState('closed');
-  // useEffect(() => {}, [windowState]);
+  // TODO: Team ID may from a part of a url
+  useEffect(() => {
+    const parsed = qs.parse(window.location.href);
+    // if (!teamId) {
+    //   console.error('Invalid team ID');
+    // }
+
+    const teamId = parsed[Object.keys(parsed)[0]];
+    localStorage.setItem('__teamId', teamId);
+  }, []);
   return (
     <Router>
       <div className="App">

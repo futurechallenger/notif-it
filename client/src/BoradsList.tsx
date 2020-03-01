@@ -46,7 +46,6 @@ const boardsReducer = (boards: BoardType[], action: ActionType) => {
       const boards = action.boards || [];
       return [...boards];
     }
-    // return;
     case 'RESET': {
       return [];
     }
@@ -87,7 +86,13 @@ const BoardsList = () => {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const boards = await getBoardsList();
+        const teamId = localStorage.getItem('__teamId');
+        if (!teamId) {
+          dispatch({ type: 'FETCH_DONE', boards: [] });
+          return;
+        }
+
+        const boards = await getBoardsList(teamId);
         console.log('==>effect boards', boards);
         dispatch({ type: 'FETCH_DONE', boards });
       } catch (e) {
@@ -110,7 +115,9 @@ const BoardsList = () => {
   const handleSubscribe = useCallback(() => {
     const subscribe = async () => {
       setSubscribeStatus('subscribing');
-      const ret = await subscribeEvents(selectedBoards);
+      const teamId = localStorage.getItem('__teamId');
+      // TODO: deal with empty team ID
+      const ret = await subscribeEvents(teamId || '', selectedBoards);
       console.log('===>Sub ret', ret);
       setSubscribeStatus('subscribed');
     };
