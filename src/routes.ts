@@ -26,23 +26,6 @@ const router = Express.Router();
 const key = process.env.TRELLO_KEY;
 const secret = process.env.TRELLO_SECRET;
 
-const oauth_secrets: { [key: string]: string } = {};
-const oauth = new OAuth(
-  requestURL,
-  accessURL,
-  key,
-  secret,
-  '1.0A',
-  loginCallback,
-  'HMAC-SHA1',
-);
-
-interface RequestToken {
-  token: string;
-  tokenSecret: string;
-  results: any[];
-}
-
 let messageHook = '';
 let token = '';
 
