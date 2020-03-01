@@ -15,7 +15,6 @@ const app = Express();
 
 // View engine
 const clientPath = '../views';
-// process.env.NODE_ENV === 'dev' ? '../views' : './client';
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 app.set('views', path.join(__dirname, clientPath));

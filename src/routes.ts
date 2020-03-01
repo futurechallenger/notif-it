@@ -13,6 +13,7 @@ import {
   scope,
 } from './config';
 import * as dotenv from 'dotenv';
+import { query } from './db';
 
 type Request = Express.Request;
 type Response = Express.Response;
@@ -46,7 +47,7 @@ let messageHook = '';
 let token = '';
 
 const host =
-  process.env.NODE_ENV === 'dev'
+  process.env.NODE_ENV === 'development'
     ? 'http://localhost:8333'
     : process.env.PROJECT_DOMAIN;
 const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
@@ -133,6 +134,11 @@ router.post('/subscribe', async (req: Request, res: Response) => {
   } catch (e) {
     res.status(500).json({ message: 'Failed' });
   }
+});
+
+router.get('/query', async (_: Request, res: Response) => {
+  const ret = await query('select now()');
+  res.json(ret);
 });
 
 router.head('/trello/hook', async (_: Request, res: Response) => {
