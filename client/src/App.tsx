@@ -9,10 +9,6 @@ const App = () => {
   // TODO: Team ID may from a part of a url
   useEffect(() => {
     const parsed = qs.parse(window.location.href);
-    // if (!teamId) {
-    //   console.error('Invalid team ID');
-    // }
-
     const teamId = parsed[Object.keys(parsed)[0]];
     localStorage.setItem('__teamId', teamId);
   }, []);

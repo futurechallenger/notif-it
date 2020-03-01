@@ -13,14 +13,14 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({ title }) => {
 
   const w = window as any;
   if (!w.callback) {
-    const callback = (param: string) => {
+    const callback = async (param: string) => {
       if (!param) {
         console.error('ERROR: param is invalid!');
         return;
       }
 
       try {
-        const ret = Axios.post(`${host}/callback`, { t: param });
+        const ret = await Axios.post(`${host}/callback`, { t: param });
         console.log('token', ret);
         history.replace('/content');
       } catch (e) {
