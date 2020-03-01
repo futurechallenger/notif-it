@@ -3,5 +3,5 @@
 ### TODO:
 
 - [ ] JWT for security
-- [ ] Board list
-- [ ] ...
+- [ ] Update board list
+- [ ] Message
