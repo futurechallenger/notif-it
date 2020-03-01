@@ -60,6 +60,7 @@ router.post('/callback', async (req: Request, res: Response) => {
 
     res.json({ message: 'OK' });
   } catch (e) {
+    console.error('ERROR: ', e);
     res.status(500).json({ message: 'Failed' });
   }
 });
@@ -95,6 +96,7 @@ router.get('/events/:teamId', async (req: Request, res: Response) => {
       data: boardsInfo.data,
     });
   } catch (e) {
+    console.error('ERROR: ', e);
     res.status(500).json({ message: 'Failed' });
   }
 });
@@ -124,6 +126,7 @@ router.post('/subscribe', async (req: Request, res: Response) => {
 
     res.json({ message: 'OK' });
   } catch (e) {
+    console.error('ERROR: ', e);
     res.status(500).json({ message: 'Failed' });
   }
 });
@@ -171,6 +174,7 @@ router.post('/trello/hook', async (req: Request, res: Response) => {
 
     res.status(200).json({ message: 'OK' });
   } catch (e) {
+    console.error('ERROR: ', e);
     res.status(500).json({ message: e.message });
   }
 });
