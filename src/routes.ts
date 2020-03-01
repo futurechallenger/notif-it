@@ -2,6 +2,7 @@ import * as Express from 'express';
 import Axios from 'axios';
 import { OAuth } from 'oauth';
 import * as url from 'url';
+import { get } from 'lodash';
 import {
   trelloHost,
   accessURL,
@@ -71,7 +72,8 @@ router.get('/events/:teamId', async (req: Request, res: Response) => {
   try {
     const teamId = req.param('teamId');
     console.log('===>events team id:', teamId);
-    const token = await getTeamToken(teamId);
+    const tokenRet = await getTeamToken(teamId);
+    const token = get(tokenRet, ['tk'], null);
     if (!token) {
       throw new Error('Cannot get token for team');
     }
