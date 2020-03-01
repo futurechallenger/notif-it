@@ -23,12 +23,7 @@ dotenv.config();
 
 const router = Express.Router();
 
-// TODO: this is oauth 1
-const key = process.env.TRELLO_KEY;
-const secret = process.env.TRELLO_SECRET;
-
 let messageHook = '';
-let token = '';
 
 const host =
   process.env.NODE_ENV === 'development'
@@ -123,6 +118,8 @@ router.post('/subscribe', async (req: Request, res: Response) => {
       throw new Error('Cannot get token for team');
     }
 
+    //TODO: Set / update hook
+
     let promises = [];
     if (events.length > 0) {
       promises = events.map((eId: string) =>
@@ -143,8 +140,6 @@ router.post('/subscribe', async (req: Request, res: Response) => {
 });
 
 router.get('/query', async (req: Request, res: Response) => {
-  // const ret = await query('select 1 from team');
-  // const ret = await storeToken(req.query.teamId, req.query.token);
   const ret = await storeEnvets(req.query.teamId, req.query.events);
   res.json(ret);
 });
