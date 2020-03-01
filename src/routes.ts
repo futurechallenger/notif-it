@@ -115,6 +115,14 @@ router.post('/subscribe', async (req: Request, res: Response) => {
       throw new Error('DB error in keep events');
     }
 
+    // get token
+    console.log('===>events team id:', teamId);
+    const tokenRet = await getTeamToken(teamId);
+    const token = get(tokenRet, ['tk'], null);
+    if (!token) {
+      throw new Error('Cannot get token for team');
+    }
+
     let promises = [];
     if (events.length > 0) {
       promises = events.map((eId: string) =>
