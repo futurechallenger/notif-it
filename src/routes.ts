@@ -13,7 +13,7 @@ import {
   scope,
 } from './config';
 import * as dotenv from 'dotenv';
-import { query } from './db';
+import { getTeamToken, storeToken, storeEnvets } from './db';
 
 type Request = Express.Request;
 type Response = Express.Response;
@@ -35,17 +35,7 @@ const host =
     : process.env.PROJECT_DOMAIN;
 const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
 
-// TODO: replace key with env var
 router.get('/', (_: Request, res: Response) => {
-  // if (!token) {
-  //   res.render('home', {
-  //     title: 'Trello Notification App',
-  //     url: authUrl,
-  //     host,
-  //   });
-  //   return;
-  // }
-
   res.render('index');
 });
 
@@ -59,19 +49,31 @@ router.get('/callback', async (req: Request, res: Response) => {
   res.redirect('/success.html');
 });
 
-router.post('/callback', (req: Request, res: Response) => {
+router.post('/callback', async (req: Request, res: Response) => {
   try {
-    const { t } = req.body;
-    // TODO: Store token here
-    token = t;
+    const { t, teamId } = req.body;
+
+    const ret = await storeToken(teamId, t);
+    if (ret <= 0) {
+      throw new Error('DB error to keep tk');
+    }
+
     res.json({ message: 'OK' });
   } catch (e) {
     res.status(500).json({ message: 'Failed' });
   }
 });
 
-router.get('/events', async (_: Request, res: Response) => {
+// TODO: udpate boards
+// TODO: use cache to reduce db query
+router.get('/events/:teamId', async (req: Request, res: Response) => {
   try {
+    const teamId = req.param('teamId');
+    const token = await getTeamToken(teamId);
+    if (!token) {
+      throw new Error('Cannot get token for team');
+    }
+
     // Get user info
     const userInfoURI = `${trelloHost}members/me?key=${process.env.TRELLO_KEY}&token=${token}`;
     let userInfo = await Axios.get(userInfoURI);
@@ -86,6 +88,8 @@ router.get('/events', async (_: Request, res: Response) => {
       throw new Error('Get boards error');
     }
 
+    // TODO: get selected boards for updating
+
     res.json({
       message: 'OK',
       data: boardsInfo.data,
@@ -97,11 +101,15 @@ router.get('/events', async (_: Request, res: Response) => {
 
 router.post('/subscribe', async (req: Request, res: Response) => {
   try {
-    const { events } = req.body;
+    const { teamId, events } = req.body;
     console.log('==>Events', events);
 
-    //TODO: check if db contains this team. if it does, upate. If not set the hook
-    // https://api.trello.com/1/webhooks/?idModel=5e4b4f2fd5d8d9070ad67c15&description="My Webhook"&callbackURL=https://j-int.herokuapp.com/trello/hook&key=bbe35d4f98acd015fe7204bcb80e5567&token=43777f0b40a7361a08c362a5c2b1c8bb4d6f5a8abe97326f10b5da51b78231b7
+    // Store events
+    const ret = await storeEnvets(teamId, events);
+    if (ret <= 0) {
+      throw new Error('DB error in keep events');
+    }
+
     let promises = [];
     if (events.length > 0) {
       promises = events.map((eId: string) =>
@@ -111,6 +119,7 @@ router.post('/subscribe', async (req: Request, res: Response) => {
         }),
       );
       const ret = await Promise.all(promises);
+      console.log('===>Set hook ret: ', ret);
     }
 
     res.json({ message: 'OK' });
@@ -119,8 +128,16 @@ router.post('/subscribe', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/query', async (_: Request, res: Response) => {
-  const ret = await query('select now()');
+router.get('/query', async (req: Request, res: Response) => {
+  // const ret = await query('select 1 from team');
+  // const ret = await storeToken(req.query.teamId, req.query.token);
+  const ret = await storeEnvets(req.query.teamId, req.query.events);
+  res.json(ret);
+});
+
+router.post('/query', async (req: Request, res: Response) => {
+  const { teamId, events } = req.body;
+  const ret = await storeEnvets(teamId, events);
   res.json(ret);
 });
 

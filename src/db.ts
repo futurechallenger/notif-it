@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';
+import * as moment from 'moment';
 
 dotenv.config();
 
@@ -21,22 +22,71 @@ pool.on('error', (err) => {
   process.exit(-1);
 });
 
-async function query(sql: string, values?: any[]): Promise<any | null> {
+async function query(sql: string, values?: any[]): Promise<any | undefined> {
+  if (!values || !Array.isArray(values)) {
+    throw new Error('Invalid values for db');
+  }
+
   try {
     // const res = await client.query('SELECT * FROM users WHERE id = $1', [1]);
     let ret;
     if (!values) {
       ret = await pool.query(sql);
     } else {
-      ret = await pool.query(sql, values || []);
+      ret = await pool.query(sql, values);
     }
     console.log(ret.rows[0]);
     return ret.rows[0];
   } catch (e) {
     console.error('ERROR', e);
+    return undefined;
   }
-
-  return null;
 }
 
-export { query };
+async function getTeamToken(teamId: string): Promise<string | undefined> {
+  const ret = await query('select tk from team where teamId=$1', [teamId]);
+  return ret;
+}
+
+async function storeToken(teamId: string, token: string): Promise<number> {
+  const client = await pool.connect();
+  try {
+    const ret = await client.query('select 1 from team where teamId=$1', [
+      teamId,
+    ]);
+
+    let opRet;
+    // Update
+    if (ret.rowCount > 0) {
+      opRet = await client.query(
+        `update team set tk=$1, updatedAt=$2 where teamId='${teamId}'`,
+        [token, +moment.utc().format('X')],
+      );
+    } else {
+      // Insert
+      opRet = await client.query(
+        'insert into team (teamId, tk, createdAt) values ($1, $2, $3)',
+        [teamId, token, +moment.utc().format('X')],
+      );
+    }
+
+    return opRet.rowCount;
+  } catch (e) {
+    console.error('OP ERROR', e);
+  } finally {
+    client.release();
+  }
+
+  return -1;
+}
+
+async function storeEnvets(teamId: string, events: string[]): Promise<number> {
+  const ret = await query(
+    'update team set events=$1, updatedAt=$2 where teamId=$3',
+    [events.join(','), +moment.utc().format('X'), teamId],
+  );
+
+  return !ret ? -1 : 1;
+}
+
+export { query, storeToken, storeEnvets, getTeamToken };
