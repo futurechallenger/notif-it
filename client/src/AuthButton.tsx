@@ -20,7 +20,8 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({ title }) => {
       }
 
       try {
-        const ret = await Axios.post(`${host}/callback`, { t: param });
+        const teamId = localStorage.getItem('__teamId');
+        const ret = await Axios.post(`${host}/callback`, { t: param, teamId });
         console.log('token', ret);
         history.replace('/content');
       } catch (e) {
