@@ -70,6 +70,7 @@ router.post('/callback', async (req: Request, res: Response) => {
 router.get('/events/:teamId', async (req: Request, res: Response) => {
   try {
     const teamId = req.param('teamId');
+    console.log('===>events team id:', teamId);
     const token = await getTeamToken(teamId);
     if (!token) {
       throw new Error('Cannot get token for team');
