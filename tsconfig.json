@@ -21,7 +21,8 @@
     "outDir": "./build",
     "paths": {
       "@src/*": ["src/*"],
-      "@services/*": ["src/services/*"]
+      "@services/*": ["src/services/*"],
+      "@util/*": ["src/util/*"]
     }
   },
   // "exclude": ["**/*.js"]

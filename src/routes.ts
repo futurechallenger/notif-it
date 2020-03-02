@@ -12,7 +12,7 @@ import {
   loginCallback,
   requestURL,
   scope,
-} from './config';
+} from './util/config';
 import * as dotenv from 'dotenv';
 import { getTeamHook, getTeamToken, storeToken, storeEnvets } from './db';
 import { parseAction } from './services/trelloService';
@@ -118,10 +118,12 @@ router.post('/subscribe', async (req: Request, res: Response) => {
     }
 
     //TODO: Set / update hook
+    // 1. get parsed events
+    const parsedEvents = []; //[{ eId, action: 'put|post' }];
 
     let promises = [];
     if (events.length > 0) {
-      promises = events.map((eId: string) =>
+      promises = events.map(({ eId, action }) =>
         Axios({
           method: 'post',
           url: `${trelloHost}webhooks/?idModel=${eId}&description="My Webhook"&callbackURL=${process.env.PROJECT_DOMAIN}/trello/hook&key=${process.env.TRELLO_KEY}&token=${token}`,
