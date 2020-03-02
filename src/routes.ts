@@ -14,7 +14,8 @@ import {
   scope,
 } from './config';
 import * as dotenv from 'dotenv';
-import { getTeamToken, storeToken, storeEnvets } from './db';
+import { getTeamHook, getTeamToken, storeToken, storeEnvets } from './db';
+import { parseAction } from './services/trelloService';
 
 type Request = Express.Request;
 type Response = Express.Response;
@@ -22,8 +23,6 @@ type Response = Express.Response;
 dotenv.config();
 
 const router = Express.Router();
-
-let messageHook = '';
 
 const host =
   process.env.NODE_ENV === 'development'
@@ -150,32 +149,30 @@ router.post('/query', async (req: Request, res: Response) => {
   res.json(ret);
 });
 
-router.head('/trello/hook', async (_: Request, res: Response) => {
+router.head('/trello/hook/:teamId', async (req: Request, res: Response) => {
+  const teamId = req.params.teamId;
+  console.log(`Webhook req: ${req.url} of team : ${teamId}`);
   res.status(200).json({ message: 'OK' });
 });
 
-router.post('/trello/hook', async (req: Request, res: Response) => {
-  console.log('===>HOOK BODY', JSON.stringify(req.body));
+router.post('/trello/hook/:teamId', async (req: Request, res: Response) => {
+  const teamId = req.params.teamId;
+  console.log(`===>HOOK BODY of team: ${teamId}`, JSON.stringify(req.body));
+
+  // Find hook to send data to
+  const hookRet = await getTeamHook(teamId);
+  const messageHook = get(hookRet, 'hook', null);
+  if (!messageHook) {
+    throw new Error('Cannot get team Id to proceed');
+  }
 
   try {
-    const {
-      model: { name = ' error model' },
-      action: { type = 'error action' },
-    } = req.body;
+    const hookRet = req.body;
+    const hookNormalized = parseAction(hookRet);
 
-    if (messageHook) {
-      console.log('===>Hook', messageHook);
+    const ret = await Axios.post(messageHook, hookNormalized);
 
-      const ret = await Axios.post(
-        messageHook,
-        JSON.stringify({
-          title: `***${name}***`,
-          text: `Action: ${type}`,
-        }),
-      );
-
-      console.log('===>POST RET', ret);
-    }
+    console.log('===>POST RET', ret);
 
     res.status(200).json({ message: 'OK' });
   } catch (e) {
