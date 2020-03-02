@@ -9,6 +9,7 @@ module.exports = {
     '^@src(.*)$': '<rootDir>/src/$1',
     // '^@services(.*)$': `${path.join(__dirname, './src', 'services')}/$1`,
     '^@services(.*)$': '<rootDir>/src/services/$1',
+    '^@util(.*)$': '<rootDir>/src/util/$1',
   },
   transform: {
     '^.+\\.ts$': 'ts-jest',
