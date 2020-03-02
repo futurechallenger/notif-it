@@ -18,14 +18,11 @@
     "strict": false,
     "baseUrl": ".",
     // "rootDir": ".", // Key to keep the directory structure in build
-    "outDir": "./build"
-    // "paths": {
-    //   "@lib/*": ["lib/*"],
-    //   "@interfaces/*": ["interfaces/*"],
-    //   "@conference/*": ["services/conference/src/lambda/*"],
-    //   "@meeting/*": ["services/meeting/src/lambda/*"],
-    //   "@services/*": ["services/*"]
-    // }
+    "outDir": "./build",
+    "paths": {
+      "@src/*": ["src/*"],
+      "@services/*": ["src/services/*"]
+    }
   },
   // "exclude": ["**/*.js"]
   "exclude": ["node_modules", "build", "client", "views"]

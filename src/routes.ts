@@ -15,6 +15,7 @@ import {
 } from './config';
 import * as dotenv from 'dotenv';
 import { getTeamHook, getTeamToken, storeToken, storeEnvets } from './db';
+import { parseAction } from './services/trelloService';
 
 type Request = Express.Request;
 type Response = Express.Response;
@@ -166,18 +167,10 @@ router.post('/trello/hook/:teamId', async (req: Request, res: Response) => {
   }
 
   try {
-    const {
-      model: { name = ' error model' },
-      action: { type = 'error action' },
-    } = req.body;
+    const hookRet = req.body;
+    const hookNormalized = parseAction(hookRet);
 
-    const ret = await Axios.post(
-      messageHook,
-      JSON.stringify({
-        title: `***${name}***`,
-        text: `Action: ${type}`,
-      }),
-    );
+    const ret = await Axios.post(messageHook, hookNormalized);
 
     console.log('===>POST RET', ret);
 

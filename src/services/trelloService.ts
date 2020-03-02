@@ -1,16 +1,18 @@
 import Axios from 'axios';
 
-async function parseAction(payload: any) {
+function parseAction(payload: any) {
   // const getAtMentionText=() =>{
   //   return _.unescape(Remove_Markdown(this.get('activity').replace(/\n/g, ' ')));
   // },
+
+  this.payload = payload;
 
   /**
    * Filter if the event is subscribed
    */
   const canPost = (eventName: string): boolean => {
     console.log('===Subscribed event is ', eventName);
-    const can_post = false;
+    const can_post = true;
     //TODO: Loop subscribed events to check if the event is subscribed
     return can_post;
   };
@@ -19,24 +21,23 @@ async function parseAction(payload: any) {
    * Send translated message
    * @param data Send
    */
-  const deliverPayload = async (data: any) => {
-    // TODO: send data
-    // TODO: check format against the doc
+  // const deliverPayload = (data: any) => {
+  // TODO: send data
+  // TODO: check format against the doc
+  // const ret = Axios.post('', {
+  //   ...data,
+  //   payload: { action: payload.action },
+  // });
+  // return ret;
+  // };
 
-    const ret = await Axios.post('', {
-      ...data,
-      payload: { action: payload.action },
-    });
-    return ret;
-  };
-
-  const createList = async () => {
+  const createList = () => {
     if (!canPost('list_created')) {
       return null;
     }
 
     const action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: action.memberCreator.fullName + ' created a list',
       title: '**List**\n' + action.data.list.name,
       body:
@@ -45,7 +46,7 @@ async function parseAction(payload: any) {
         '](https://trello.com/b/' +
         action.data.board.shortLink +
         ')',
-    });
+    };
   };
 
   const updateList = () => {
@@ -62,7 +63,7 @@ async function parseAction(payload: any) {
     const list = action.data.list;
     if ('closed' in old && canPost('list_archived')) {
       var archived = list.closed ? 'archived' : 'unarchived';
-      return deliverPayload({
+      return {
         activity:
           action.memberCreator.fullName +
           ' ' +
@@ -70,9 +71,9 @@ async function parseAction(payload: any) {
           ' ' +
           list.name +
           ' list',
-      });
+      };
     } else if ('name' in old && canPost('list_renamed')) {
-      return deliverPayload({
+      return {
         activity: action.memberCreator.fullName + ' renamed a list',
         title:
           '[' +
@@ -82,17 +83,17 @@ async function parseAction(payload: any) {
           ') (was ' +
           old.name +
           ')',
-      });
+      };
     }
   };
 
-  const moveListFromBoard = async () => {
+  const moveListFromBoard = () => {
     if (!canPost('list_moved')) {
       return null;
     }
 
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: action.memberCreator.fullName + ' moved a list',
       title: '**List**\n' + action.data.list.name,
       body:
@@ -101,16 +102,16 @@ async function parseAction(payload: any) {
         ' (was ' +
         action.data.board.name +
         ')',
-    });
+    };
   };
 
-  const moveListToBoard = async () => {
+  const moveListToBoard = () => {
     if (!canPost('list_moved')) {
       return null;
     }
 
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: action.memberCreator.fullName + ' moved a list',
       title: '**List**\n' + action.data.list.name,
       body:
@@ -122,10 +123,10 @@ async function parseAction(payload: any) {
         ' (was ' +
         action.data.boardSource.name +
         ')',
-    });
+    };
   };
 
-  const updateBoard = async () => {
+  const updateBoard = () => {
     var action = this.payload.action;
     if (
       !canPost('board_renamed') ||
@@ -137,26 +138,18 @@ async function parseAction(payload: any) {
       return null;
     }
 
-    return deliverPayload({
-      activity: action.memberCreator.fullName + ' renamed a board',
-      title:
-        '**Board**\n[' +
-        action.data.board.name +
-        '](https://trello.com/b/' +
-        action.data.board.shortLink +
-        ')' +
-        ' (was ' +
-        action.data.old.name +
-        ')',
-    });
+    return {
+      activity: `${action.memberCreator.fullName} renamed a board`,
+      title: `**Board**\n[${action.data.board.name}](https://trello.com/b/${action.data.board.shortLink})(was ${action.data.old.name})`,
+    };
   };
 
-  const addMemberToBoard = async () => {
+  const addMemberToBoard = () => {
     if (!canPost('board_member_added')) {
       return null;
     }
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity:
         action.member.fullName +
         ' added to ' +
@@ -164,19 +157,19 @@ async function parseAction(payload: any) {
         ' board',
       //'[' + action.member.fullName + '](https://trello.com/' + action.member.username + ') added to ' +
       //	'[' + action.data.board.name + '](https://trello.com/b/' + action.data.board.shortLink + ') board'
-    });
+    };
   };
 
-  const emailCard = async () => {
+  const emailCard = () => {
     this.createCard();
   };
 
-  const createCard = async () => {
+  const createCard = () => {
     if (!canPost('card_created')) {
       return null;
     }
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: action.memberCreator.fullName + ' created a card',
       title:
         '**Card**\n[' +
@@ -190,15 +183,15 @@ async function parseAction(payload: any) {
         '](https://trello.com/b/' +
         action.data.board.shortLink +
         ')',
-    });
+    };
   };
 
-  const moveCardToBoard = async () => {
+  const moveCardToBoard = () => {
     if (!canPost('card_moved')) {
       return null;
     }
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: action.memberCreator.fullName + ' moved a card',
       title: '**Card**\n' + action.data.card.name,
       body:
@@ -209,16 +202,16 @@ async function parseAction(payload: any) {
         ') (was ' +
         action.data.boardSource.name +
         ')',
-    });
+    };
   };
 
-  const moveCardFromBoard = async () => {
+  const moveCardFromBoard = () => {
     if (!canPost('card_moved')) {
       return null;
     }
 
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: action.memberCreator.fullName + ' moved a card',
       title: '**Card**\n' + action.data.card.name,
       body:
@@ -227,148 +220,127 @@ async function parseAction(payload: any) {
         ' (was ' +
         action.data.board.name +
         ')',
-    });
+    };
   };
 
-  const updateCard = async () => {
+  const updateCard = () => {
     var action = this.payload.action;
     var old = action.data.old;
     if ('idList' in old && canPost('card_moved')) {
-      return deliverPayload({
-        activity: action.memberCreator.fullName + ' moved a card',
-        title:
-          '**Card**\n[' +
-          action.data.card.name +
-          '](https://trello.com/c/' +
-          action.data.card.shortLink +
-          ')',
-        body:
-          '**List**\n[' +
-          action.data.listAfter.name +
-          '](https://trello.com/b/' +
-          action.data.board.shortLink +
-          ')' +
-          ' (was ' +
-          action.data.listBefore.name +
-          ')',
-      });
+      return {
+        activity: `${action.memberCreator.fullName} moved a card`,
+        title: `**Card**\n[${action.data.card.name}](https://trello.com/c/${action.data.card.shortLink})`,
+        body: `**List**\n[${action.data.listAfter.name}](https://trello.com/b/${action.data.board.shortLink}) (was ${action.data.listBefore.name})`,
+      };
     } else if ('name' in old && canPost('card_renamed')) {
-      return deliverPayload({
-        activity: action.memberCreator.fullName + ' renamed a card',
-        title:
-          '**Card**\n[' +
-          action.data.card.name +
-          '](https://trello.com/c/' +
-          action.data.card.shortLink +
-          ')' +
-          ' (was ' +
-          old.name +
-          ')',
-      });
+      return {
+        activity: `${action.memberCreator.fullName} renamed a card`,
+        title: `**Card**\n[${action.data.card.name}](https://trello.com/c/${action.data.card.shortLink}) (was ${old.name})`,
+      };
     } else if ('desc' in old && canPost('card_description')) {
-      return deliverPayload({
+      return {
         activity:
           action.memberCreator.fullName + ' updated ' + action.data.card.name,
         title: '**Card Description**\n' + action.data.card.desc,
-      });
+      };
     } else if ('due' in old && canPost('card_due_date')) {
       var day = new Date(action.data.card.due);
-      return deliverPayload({
+      return {
         activity:
           action.memberCreator.fullName + ' updated ' + action.data.card.name,
         title: `**Card Due Date**\n' ${day.getMonth() +
           1}/${day.getDate()}/${day.getFullYear()}`,
-      });
+      };
     } else if ('closed' in old && canPost('card_archived')) {
       var card = action.data.card;
       var archived = card.closed ? 'archived' : 'unarchived';
-      return deliverPayload({
+      return {
         activity: `${action.memberCreator.fullName} ${archived} ${action.data.card.name}`,
-      });
+      };
     } else {
       return null;
     }
   };
 
-  const commentCard = async () => {
+  const commentCard = () => {
     if (!canPost('card_comment')) {
       return null;
     }
 
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: `${action.memberCreator.fullName} commented on  ${action.data.card.name}`,
       title: action.data.text,
-    });
+    };
   };
 
-  const addAttachmentToCard = async () => {
+  const addAttachmentToCard = () => {
     if (!canPost('card_attachment')) {
       return null;
     }
 
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: `${action.memberCreator.fullName} added an attachment to ${action.data.card.name}`,
       title: `**File**\n[${action.data.attachment.name}](${action.data.attachment.url})`,
-    });
+    };
   };
 
-  const addMemberToCard = async () => {
+  const addMemberToCard = () => {
     if (!canPost('card_member_added')) {
       return null;
     }
 
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: `${action.member.fullName} added to ${action.data.card.name} card`,
-    });
+    };
   };
 
-  const addChecklistToCard = async () => {
+  const addChecklistToCard = () => {
     if (!canPost('checklist_added')) {
       return null;
     }
 
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: `${action.memberCreator.fullName} added a checklist to ${action.data.card.name}`,
       title: `**Checklist**\n' ${action.data.checklist.name}`,
-    });
+    };
   };
 
-  const createCheckItem = async () => {
+  const createCheckItem = () => {
     if (!canPost('checklist_created')) {
       return null;
     }
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity: `${action.memberCreator.fullName} added a checklist item to ${action.data.card.name}`,
       title: `**Item**\n ${action.data.checkItem.name}`,
       body: `**Checklist**\n ${action.data.checklist.name}`,
-    });
+    };
   };
 
-  const updateCheckItemStateOnCard = async () => {
+  const updateCheckItemStateOnCard = () => {
     if (!canPost('checklist_toggled')) {
       return null;
     }
     var action = this.payload.action;
-    return deliverPayload({
+    return {
       activity:
         action.data.checkItem.state === 'complete'
           ? `${action.memberCreator.fullName} completed ${action.data.checkItem.name}`
           : `${action.memberCreator.fullName} marked ${action.data.checkItem.name} incomplete`,
-    });
+    };
   };
 
   const actionType = payload.action.type;
   switch (actionType) {
     case 'createList': {
-      return await createList();
+      return createList();
     }
     case 'updateList': {
-      return await updateList();
+      return updateList();
     }
     case 'moveListFromBoard': {
       return moveListFromBoard();
