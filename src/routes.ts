@@ -155,7 +155,6 @@ router.head('/trello/hook', async (_: Request, res: Response) => {
 });
 
 router.post('/trello/hook', async (req: Request, res: Response) => {
-  console.log('===>HOOK', JSON.stringify(req));
   console.log('===>HOOK BODY', JSON.stringify(req.body));
 
   try {
