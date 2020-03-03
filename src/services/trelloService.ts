@@ -170,7 +170,9 @@ function parseAction(payload: any) {
     }
     var action = this.payload.action;
     return {
-      activity: action.memberCreator.fullName + ' created a card',
+      activity: `${action.memberCreator.fullName} created a card`,
+      //TODO: For temp test only
+      text: `${action.memberCreator.fullName} created a card`,
       title:
         '**Card**\n[' +
         action.data.card.name +
@@ -229,25 +231,31 @@ function parseAction(payload: any) {
     if ('idList' in old && canPost('card_moved')) {
       return {
         activity: `${action.memberCreator.fullName} moved a card`,
+        //TODO: For temp test only
+        text: `${action.memberCreator.fullName} moved a card`,
         title: `**Card**\n[${action.data.card.name}](https://trello.com/c/${action.data.card.shortLink})`,
         body: `**List**\n[${action.data.listAfter.name}](https://trello.com/b/${action.data.board.shortLink}) (was ${action.data.listBefore.name})`,
       };
     } else if ('name' in old && canPost('card_renamed')) {
       return {
         activity: `${action.memberCreator.fullName} renamed a card`,
+        //TODO: For temp test only
+        text: `${action.memberCreator.fullName} renamed a card`,
         title: `**Card**\n[${action.data.card.name}](https://trello.com/c/${action.data.card.shortLink}) (was ${old.name})`,
       };
     } else if ('desc' in old && canPost('card_description')) {
       return {
-        activity:
-          action.memberCreator.fullName + ' updated ' + action.data.card.name,
+        activity: `${action.memberCreator.fullName} updated ${action.data.card.name}`,
+        //TODO: For temp test only
+        text: `${action.memberCreator.fullName} updated ${action.data.card.name}`,
         title: '**Card Description**\n' + action.data.card.desc,
       };
     } else if ('due' in old && canPost('card_due_date')) {
       var day = new Date(action.data.card.due);
       return {
-        activity:
-          action.memberCreator.fullName + ' updated ' + action.data.card.name,
+        activity: `${action.memberCreator.fullName} updated ${action.data.card.name}`,
+        //TODO: For temp test only
+        text: `${action.memberCreator.fullName} updated ${action.data.card.name}`,
         title: `**Card Due Date**\n' ${day.getMonth() +
           1}/${day.getDate()}/${day.getFullYear()}`,
       };
@@ -256,6 +264,8 @@ function parseAction(payload: any) {
       var archived = card.closed ? 'archived' : 'unarchived';
       return {
         activity: `${action.memberCreator.fullName} ${archived} ${action.data.card.name}`,
+        //TODO: For temp test only
+        text: `${action.memberCreator.fullName} ${archived} ${action.data.card.name}`,
       };
     } else {
       return null;
@@ -270,6 +280,8 @@ function parseAction(payload: any) {
     var action = this.payload.action;
     return {
       activity: `${action.memberCreator.fullName} commented on  ${action.data.card.name}`,
+      //TODO: For temp test only
+      text: `${action.memberCreator.fullName} commented on  ${action.data.card.name}`,
       title: action.data.text,
     };
   };
@@ -294,6 +306,8 @@ function parseAction(payload: any) {
     var action = this.payload.action;
     return {
       activity: `${action.member.fullName} added to ${action.data.card.name} card`,
+      //TODO: For temp test only
+      text: `${action.member.fullName} added to ${action.data.card.name} card`,
     };
   };
 
