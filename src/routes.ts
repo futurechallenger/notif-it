@@ -193,10 +193,10 @@ router.post('/trello/hook/:teamId', async (req: Request, res: Response) => {
 
     console.log('===>POST RET', ret);
 
-    res.status(200).json({ message: 'OK' });
+    res.status(200).json({ status: 'OK' });
   } catch (e) {
     console.error('ERROR: ', e);
-    res.status(500).json({ message: e.message });
+    res.status(200).json({ message: e.message });
   }
 });
 
