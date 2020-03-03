@@ -153,19 +153,6 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-let messageHook;
-router.post('/message/hook', (req: Request, res: Response) => {
-  const { hook = null } = req.body;
-  if (!hook) {
-    res.json({ status: 'Failed', message: '' });
-    return;
-  }
-
-  messageHook = hook;
-
-  res.json({ status: 'OK', message: `Hook is ${messageHook}` });
-});
-
 router.head('/trello/hook/:teamId', async (req: Request, res: Response) => {
   const teamId = req.params.teamId;
   console.log(`Webhook req: ${req.url} of team : ${teamId}`);

@@ -28,7 +28,6 @@ async function query(sql: string, values?: any[]): Promise<any | undefined> {
   }
 
   try {
-    // const res = await client.query('SELECT * FROM users WHERE id = $1', [1]);
     let ret;
     if (!values) {
       ret = await pool.query(sql);
