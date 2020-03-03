@@ -55,6 +55,15 @@ async function getTeamHook(teamId: string): Promise<string | null> {
   return ret.rowCount > 0 ? ret.rows[0] : null;
 }
 
+async function setTeamHook(teamId: string, hook: string): Promise<boolean> {
+  const ret = await query('update team set hook=$1 where teamId=$2', [
+    hook,
+    teamId,
+  ]);
+
+  return ret.rowCount > 0;
+}
+
 async function storeToken(teamId: string, token: string): Promise<number> {
   const client = await pool.connect();
   try {
@@ -96,4 +105,11 @@ async function storeEnvets(teamId: string, events: string[]): Promise<number> {
   return ret.rowCount;
 }
 
-export { query, storeToken, storeEnvets, getTeamToken, getTeamHook };
+export {
+  query,
+  storeToken,
+  storeEnvets,
+  getTeamToken,
+  getTeamHook,
+  setTeamHook,
+};
