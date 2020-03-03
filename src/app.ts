@@ -1,3 +1,4 @@
+import 'module-alias/register';
 import * as dotenv from 'dotenv';
 import * as Express from 'express';
 import * as compression from 'compression';
