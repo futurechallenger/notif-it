@@ -1,5 +1,5 @@
 import * as Express from 'express';
-import Axios from 'axios';
+import Axios, { AxiosAdapter } from 'axios';
 import { OAuth } from 'oauth';
 import * as url from 'url';
 import { get } from 'lodash';
@@ -16,6 +16,7 @@ import {
 import * as dotenv from 'dotenv';
 import { getTeamHook, getTeamToken, storeToken, storeEnvets } from './db';
 import { parseAction } from './services/trelloService';
+import { EventHook, parseEvents } from './services/eventService';
 
 type Request = Express.Request;
 type Response = Express.Response;
@@ -119,16 +120,24 @@ router.post('/subscribe', async (req: Request, res: Response) => {
 
     //TODO: Set / update hook
     // 1. get parsed events
-    const parsedEvents = []; //[{ eId, action: 'put|post' }];
+    const parsedEvents: EventHook[] = await parseEvents(teamId, events);
 
     let promises = [];
-    if (events.length > 0) {
-      promises = events.map(({ eId, action }) =>
-        Axios({
-          method: 'post',
-          url: `${trelloHost}webhooks/?idModel=${eId}&description="My Webhook"&callbackURL=${process.env.PROJECT_DOMAIN}/trello/hook&key=${process.env.TRELLO_KEY}&token=${token}`,
-        }),
-      );
+    if (parsedEvents && parsedEvents.length > 0) {
+      promises = events.map(({ eventId, hookId, action }: EventHook) => {
+        let url;
+        if (action === 'post') {
+          url = `${trelloHost}webhooks/?idModel=${eventId}&description="My Webhook"&callbackURL=${process.env.PROJECT_DOMAIN}/trello/hook/${teamId}&key=${process.env.TRELLO_KEY}&token=${token}`;
+        } else if (action === 'delete') {
+          url = `${trelloHost}webhooks/${hookId}?key={process.env.TRELL_KEY}`;
+        } else {
+          url = `${trelloHost}webhooks/${hookId}?description="My Webhook"`;
+        }
+        const ret = Axios({
+          method: action,
+          url,
+        });
+      });
       const ret = await Promise.all(promises);
       console.log('===>Set hook ret: ', ret);
     }
