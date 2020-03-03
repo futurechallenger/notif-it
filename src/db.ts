@@ -28,7 +28,6 @@ async function query(sql: string, values?: any[]): Promise<any | undefined> {
   }
 
   try {
-    // const res = await client.query('SELECT * FROM users WHERE id = $1', [1]);
     let ret;
     if (!values) {
       ret = await pool.query(sql);
@@ -53,6 +52,15 @@ async function getTeamHook(teamId: string): Promise<string | null> {
   const ret = await query('select hook from team where teamId=$1', [teamId]);
   console.log('get team hook', ret);
   return ret.rowCount > 0 ? ret.rows[0] : null;
+}
+
+async function setTeamHook(teamId: string, hook: string): Promise<boolean> {
+  const ret = await query('update team set hook=$1 where teamId=$2', [
+    hook,
+    teamId,
+  ]);
+
+  return ret.rowCount > 0;
 }
 
 async function storeToken(teamId: string, token: string): Promise<number> {
@@ -96,4 +104,11 @@ async function storeEnvets(teamId: string, events: string[]): Promise<number> {
   return ret.rowCount;
 }
 
-export { query, storeToken, storeEnvets, getTeamToken, getTeamHook };
+export {
+  query,
+  storeToken,
+  storeEnvets,
+  getTeamToken,
+  getTeamHook,
+  setTeamHook,
+};

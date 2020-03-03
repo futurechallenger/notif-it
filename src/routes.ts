@@ -53,7 +53,7 @@ router.post('/callback', async (req: Request, res: Response) => {
       throw new Error('DB error to keep tk');
     }
 
-    res.json({ message: 'OK' });
+    res.json({ status: 'OK' });
   } catch (e) {
     console.error('ERROR: ', e);
     res.status(500).json({ message: 'Failed' });
@@ -89,7 +89,7 @@ router.get('/events/:teamId', async (req: Request, res: Response) => {
     // TODO: get selected boards for updating
 
     res.json({
-      message: 'OK',
+      status: 'OK',
       data: boardsInfo.data,
     });
   } catch (e) {
@@ -133,23 +133,25 @@ router.post('/subscribe', async (req: Request, res: Response) => {
       console.log('===>Set hook ret: ', ret);
     }
 
-    res.json({ message: 'OK' });
+    res.json({ status: 'OK' });
   } catch (e) {
     console.error('ERROR: ', e);
-    res.status(500).json({ message: 'Failed' });
+    res.status(500).json({ status: 'Failed' });
   }
 });
 
-router.get('/query', async (req: Request, res: Response) => {
-  const ret = await storeEnvets(req.query.teamId, req.query.events);
-  res.json(ret);
-});
+if (process.env.NODE_ENV === 'development') {
+  router.get('/query', async (req: Request, res: Response) => {
+    const ret = await storeEnvets(req.query.teamId, req.query.events);
+    res.json(ret);
+  });
 
-router.post('/query', async (req: Request, res: Response) => {
-  const { teamId, events } = req.body;
-  const ret = await storeEnvets(teamId, events);
-  res.json(ret);
-});
+  router.post('/query', async (req: Request, res: Response) => {
+    const { teamId, events } = req.body;
+    const ret = await storeEnvets(teamId, events);
+    res.json(ret);
+  });
+}
 
 router.head('/trello/hook/:teamId', async (req: Request, res: Response) => {
   const teamId = req.params.teamId;
