@@ -1,4 +1,4 @@
-const trelloHost = 'https://trello.com/1/';
+const trelloHost = 'https://api.trello.com/1/';
 const requestURL = 'https://trello.com/1/OAuthGetRequestToken';
 const accessURL = 'https://trello.com/1/OAuthGetAccessToken';
 const authorizeURL = 'https://trello.com/1/OAuthAuthorizeToken';

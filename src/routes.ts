@@ -121,23 +121,29 @@ router.post('/subscribe', async (req: Request, res: Response) => {
     //TODO: Set / update hook
     // 1. get parsed events
     const parsedEvents: EventHook[] = await parseEvents(teamId, events);
+    console.log('==>Parsed events', parsedEvents);
 
     let promises = [];
     if (parsedEvents && parsedEvents.length > 0) {
-      promises = events.map(({ eventId, hookId, action }: EventHook) => {
-        let url;
-        if (action === 'post') {
-          url = `${trelloHost}webhooks/?idModel=${eventId}&description="My Webhook"&callbackURL=${process.env.PROJECT_DOMAIN}/trello/hook/${teamId}&key=${process.env.TRELLO_KEY}&token=${token}`;
-        } else if (action === 'delete') {
-          url = `${trelloHost}webhooks/${hookId}?key={process.env.TRELL_KEY}`;
-        } else {
-          url = `${trelloHost}webhooks/${hookId}?description="My Webhook"`;
-        }
-        const ret = Axios({
-          method: action,
-          url,
-        });
-      });
+      promises = parsedEvents.map(
+        async ({ eventId, hookId, action }: EventHook) => {
+          let url;
+          if (action === 'post') {
+            url = `${trelloHost}webhooks/?idModel=${eventId}&description="My Webhook"&callbackURL=${process.env.PROJECT_DOMAIN}/trello/hook/${teamId}&key=${process.env.TRELLO_KEY}&token=${token}`;
+          } else if (action === 'delete') {
+            url = `${trelloHost}webhooks/${hookId}?key=${process.env.TRELLO_KEY}&token=${token}`;
+          } else {
+            url = `${trelloHost}webhooks/${hookId}?description="My Webhook"&key=${process.env.TRELLO_KEY}&token=${token}`;
+          }
+          const ret = await Axios({
+            method: action,
+            url,
+          });
+
+          console.log('===>request url: ', url);
+          console.log('===>axios ret', ret);
+        },
+      );
       const ret = await Promise.all(promises);
       console.log('===>Set hook ret: ', ret);
     }

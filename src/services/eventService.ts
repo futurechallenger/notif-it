@@ -41,7 +41,7 @@ async function parseEvents(
     const currentHooks = await getEventHooks(token);
 
     // No existing webhooks
-    if (!currentHooks) {
+    if (!currentHooks || currentHooks.length === 0) {
       return dest.map((eId: string) => ({ eventId: eId, action: 'post' }));
     }
 
