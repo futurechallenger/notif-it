@@ -143,7 +143,8 @@ router.post('/subscribe', async (req: Request, res: Response) => {
           } else if (action === 'delete') {
             url = `${trelloHost}webhooks/${hookId}?key=${process.env.TRELLO_KEY}&token=${token}`;
           } else {
-            url = `${trelloHost}webhooks/${hookId}?description="My Webhook"&key=${process.env.TRELLO_KEY}&token=${token}`;
+            //TODO: No need to put for the same team
+            // url = `${trelloHost}webhooks/${hookId}?description="My Webhook"&key=${process.env.TRELLO_KEY}&token=${token}`;
           }
           const ret = await Axios({
             method: action,
