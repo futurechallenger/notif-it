@@ -104,9 +104,18 @@ async function storeEnvets(teamId: string, events: string[]): Promise<number> {
   return ret.rowCount;
 }
 
+async function getTeamEvents(teamId: string): Promise<any | null> {
+  const ret = await query('select events from team where teamId=$1', [teamId]);
+  if (ret.rowCount > 0) {
+    return ret.rows[0];
+  }
+  return null;
+}
+
 export {
   query,
   storeToken,
+  getTeamEvents,
   storeEnvets,
   getTeamToken,
   getTeamHook,

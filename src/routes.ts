@@ -14,7 +14,13 @@ import {
   scope,
 } from './util/config';
 import * as dotenv from 'dotenv';
-import { getTeamHook, getTeamToken, storeToken, storeEnvets } from './db';
+import {
+  getTeamHook,
+  getTeamToken,
+  storeToken,
+  storeEnvets,
+  getTeamEvents,
+} from './db';
 import { parseAction } from './services/trelloService';
 import { EventHook, parseEvents } from './services/eventService';
 
@@ -80,18 +86,22 @@ router.get('/events/:teamId', async (req: Request, res: Response) => {
       throw new Error('Get userinfo error');
     }
 
-    // Get boards
+    // Get boards from 3rd service
     const boardsURI = `${trelloHost}/members/${userInfo.data.username}/boards?key=${process.env.TRELLO_KEY}&token=${token}&filter=open&fields=id,name,desc`;
     const boardsInfo = await Axios.get(boardsURI);
     if (boardsInfo.status !== 200) {
       throw new Error('Get boards error');
     }
 
+    // Get selected from DB
+    const selRet = await getTeamEvents(teamId);
+    console.log('===>Selected events', selRet);
+
     // TODO: get selected boards for updating
 
     res.json({
-      status: 'OK',
-      data: boardsInfo.data,
+      boards: boardsInfo.data,
+      selected: selRet.events.split(','),
     });
   } catch (e) {
     console.error('ERROR: ', e);
