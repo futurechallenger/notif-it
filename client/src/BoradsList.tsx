@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useCallback, useState } from 'react';
-import { filter, indexOf } from 'lodash';
+import { find, each, filter, indexOf } from 'lodash';
 import { makeStyles, GridList, GridListTile, Button } from '@material-ui/core';
 import { BoardType, BoardCheckbox } from './BoardCheckbox';
 import { useImmerReducer } from 'use-immer';
@@ -12,8 +12,8 @@ type ActionType = {
 };
 
 type SelectActionType = {
-  board: string;
-  type: 'TOGGLE' | 'RESET';
+  selected: string[];
+  type: 'INIT' | 'TOGGLE' | 'RESET';
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -59,13 +59,16 @@ const selectedBoardsReducer = (
   action: SelectActionType,
 ) => {
   switch (action.type) {
+    case 'INIT':
+      return [...action.selected];
     case 'TOGGLE':
-      const exists = indexOf(selectedBoards, action.board) >= 0;
+      const el = action.selected[0];
+      const exists = indexOf(selectedBoards, el) >= 0;
       let boards: string[] = selectedBoards;
       if (exists) {
-        boards = filter(boards, (e: string) => action.board !== e);
+        boards = filter(boards, (e: string) => el !== e);
       } else {
-        boards.push(action.board);
+        boards.push(el);
       }
       return [...boards];
     case 'RESET':
@@ -92,9 +95,15 @@ const BoardsList = () => {
           return;
         }
 
-        const boards = await getBoardsList(teamId);
-        console.log('==>effect boards', boards);
-        dispatch({ type: 'FETCH_DONE', boards });
+        const ret = await getBoardsList(teamId);
+        console.log('==>effect boards', ret);
+
+        //TODO: deal with empty return or error return
+        dispatch({ type: 'FETCH_DONE', boards: ret?.boards || [] });
+        dispatchSelected({
+          type: 'INIT',
+          selected: ret?.selected || [],
+        });
       } catch (e) {
         console.error(e);
         dispatch({ type: 'RESET', boards: [] });
@@ -106,7 +115,7 @@ const BoardsList = () => {
 
   // Select/Unselect boards
   const handleSelect = (boardId: string) => {
-    dispatchSelected({ type: 'TOGGLE', board: boardId });
+    dispatchSelected({ type: 'TOGGLE', selected: [boardId] });
   };
 
   // Subscribe events

@@ -6,6 +6,7 @@ export type BoardType = {
   name: string;
   desc: string;
   id: string;
+  selected?: boolean;
 };
 
 interface BoardCheckboxProps {
