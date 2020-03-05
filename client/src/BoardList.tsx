@@ -1,10 +1,9 @@
-import React, { useEffect, useReducer, useCallback, useState } from 'react';
-import { find, each, filter, indexOf } from 'lodash';
-import { makeStyles, GridList, GridListTile, Button } from '@material-ui/core';
-import { BoardType, BoardCheckbox } from './BoardCheckbox';
-import { useImmerReducer } from 'use-immer';
-import { subscribeEvents } from './services/subscribeEvents';
+import { Button, GridList, GridListTile, makeStyles } from '@material-ui/core';
+import { filter, indexOf } from 'lodash';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
+import { BoardCheckbox, BoardType } from './BoardCheckbox';
 import { getBoardsList } from './services/boards';
+import { subscribeEvents } from './services/subscribeEvents';
 
 type ActionType = {
   boards: BoardType[];
@@ -78,7 +77,7 @@ const selectedBoardsReducer = (
   }
 };
 
-const BoardsList = () => {
+const BoardList = () => {
   const classes = useStyles();
   // const [boards, dispatch] = useImmerReducer(boardsReducer, []);
   const [boards, dispatch] = useReducer(boardsReducer, []);
@@ -154,4 +153,4 @@ const BoardsList = () => {
   );
 };
 
-export { BoardsList };
+export { BoardList };
