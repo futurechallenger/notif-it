@@ -1,28 +1,17 @@
+import Axios from 'axios';
+import * as dotenv from 'dotenv';
 import * as Express from 'express';
-import Axios, { AxiosAdapter } from 'axios';
-import { OAuth } from 'oauth';
-import * as url from 'url';
 import { get } from 'lodash';
 import {
-  trelloHost,
-  accessURL,
-  appName,
-  authorizeURL,
-  expiration,
-  loginCallback,
-  requestURL,
-  scope,
-} from './util/config';
-import * as dotenv from 'dotenv';
-import {
+  getTeamEvents,
   getTeamHook,
   getTeamToken,
-  storeToken,
   storeEnvets,
-  getTeamEvents,
+  storeToken,
 } from './db';
-import { parseAction } from './services/trelloService';
 import { EventHook, parseEvents } from './services/eventService';
+import { parseAction } from './services/trelloService';
+import { appName, expiration, scope, trelloHost } from './util/config';
 
 type Request = Express.Request;
 type Response = Express.Response;
@@ -43,6 +32,21 @@ router.get('/', (_: Request, res: Response) => {
 
 router.get('/auth', async (_: Request, res: Response) => {
   res.redirect(authUrl);
+});
+
+router.post('/auth', async (req: Request, res: Response) => {
+  const { teamId } = req.body;
+  try {
+    // TODO: if `tk` exists, this team is authed. No need to do the 3rd-service auth again
+    const ret = await getTeamToken(teamId);
+    if (!ret) {
+      res.json({ teamId });
+    }
+    res.json({ teamId });
+  } catch (e) {
+    console.error('===>post auth error', e);
+    res.status(500).json({ teamId: null });
+  }
 });
 
 // Auth callback url
