@@ -12,6 +12,7 @@ import {
 import { EventHook, parseEvents } from './services/eventService';
 import { parseAction } from './services/trelloService';
 import { appName, expiration, scope, trelloHost } from './util/config';
+import { Config } from '@lib/config';
 
 type Request = Express.Request;
 type Response = Express.Response;
@@ -24,7 +25,18 @@ const host =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:8333'
     : process.env.PROJECT_DOMAIN;
-const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
+// const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
+const config = new Config();
+const authUrl = config.getOAuth2URL({
+  serviceURL: `${trelloHost}authorize`,
+  scopes: ['read'],
+  returnURL: `${host}/callback`,
+  responseType: 'token',
+  clientId: 'tkey',
+  clientIDAlias: 'key',
+  name: process.env.APP_NAME || 'My App',
+  expiration: 'never',
+});
 
 router.get('/', (_: Request, res: Response) => {
   res.render('index');
@@ -70,6 +82,31 @@ router.post('/callback', async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Failed' });
   }
 });
+
+//TODO: Auth callback url
+// router.get(
+//   '/callback/:service/:teamId',
+//   async (req: Request, res: Response) => {
+//     console.log('==>Callback', req.query);
+//     res.redirect('/success.html');
+//   },
+// );
+
+// router.post('/callback/:service', async (req: Request, res: Response) => {
+//   try {
+//     const { t, teamId, service } = req.body;
+
+//     const ret = await storeToken(teamId, t);
+//     if (ret <= 0) {
+//       throw new Error('DB error to keep tk');
+//     }
+
+//     res.json({ status: 'OK' });
+//   } catch (e) {
+//     console.error('ERROR: ', e);
+//     res.status(500).json({ message: 'Failed' });
+//   }
+// });
 
 // TODO: udpate boards
 // TODO: use cache to reduce db query
@@ -214,5 +251,36 @@ router.post('/trello/hook/:teamId', async (req: Request, res: Response) => {
     res.status(200).json({ message: e.message });
   }
 });
+
+// TODO: /{process.env.SERVICE_NAME}/hook/{teamId}. Use this
+// path to handle hooks from 3rd party services
+// router.post('/:service/hook/:teamId', async (req: Request, res: Response) => {
+//   const { service, teamId } = req.params;
+//   console.log(
+//     `===>HOOK BODY of service: ${service} team: ${teamId}`,
+//     JSON.stringify(req.body),
+//   );
+
+//   // Find hook to send data to
+//   const hookRet = await getTeamHook(teamId);
+//   const messageHook = get(hookRet, 'hook', null);
+//   if (!messageHook) {
+//     throw new Error('Cannot get team Id to proceed');
+//   }
+
+//   try {
+//     const hookRet = req.body;
+//     const hookNormalized = parseAction(hookRet);
+
+//     const ret = await Axios.post(messageHook, hookNormalized);
+
+//     console.log('===>POST RET', ret);
+
+//     res.status(200).json({ status: 'OK' });
+//   } catch (e) {
+//     console.error('ERROR: ', e);
+//     res.status(200).json({ message: e.message });
+//   }
+// });
 
 export { router };

@@ -1,4 +1,5 @@
 import { compareEvents } from '@services/eventService';
+import { Config } from '@lib/config';
 
 describe('Test events parser', () => {
   it('compare current hooks of events and events', () => {
