@@ -71,6 +71,31 @@ router.post('/callback', async (req: Request, res: Response) => {
   }
 });
 
+//TODO: Auth callback url
+// router.get(
+//   '/callback/:service/:teamId',
+//   async (req: Request, res: Response) => {
+//     console.log('==>Callback', req.query);
+//     res.redirect('/success.html');
+//   },
+// );
+
+// router.post('/callback/:service', async (req: Request, res: Response) => {
+//   try {
+//     const { t, teamId, service } = req.body;
+
+//     const ret = await storeToken(teamId, t);
+//     if (ret <= 0) {
+//       throw new Error('DB error to keep tk');
+//     }
+
+//     res.json({ status: 'OK' });
+//   } catch (e) {
+//     console.error('ERROR: ', e);
+//     res.status(500).json({ message: 'Failed' });
+//   }
+// });
+
 // TODO: udpate boards
 // TODO: use cache to reduce db query
 router.get('/events/:teamId', async (req: Request, res: Response) => {
@@ -192,6 +217,37 @@ router.head('/trello/hook/:teamId', async (req: Request, res: Response) => {
 router.post('/trello/hook/:teamId', async (req: Request, res: Response) => {
   const teamId = req.params.teamId;
   console.log(`===>HOOK BODY of team: ${teamId}`, JSON.stringify(req.body));
+
+  // Find hook to send data to
+  const hookRet = await getTeamHook(teamId);
+  const messageHook = get(hookRet, 'hook', null);
+  if (!messageHook) {
+    throw new Error('Cannot get team Id to proceed');
+  }
+
+  try {
+    const hookRet = req.body;
+    const hookNormalized = parseAction(hookRet);
+
+    const ret = await Axios.post(messageHook, hookNormalized);
+
+    console.log('===>POST RET', ret);
+
+    res.status(200).json({ status: 'OK' });
+  } catch (e) {
+    console.error('ERROR: ', e);
+    res.status(200).json({ message: e.message });
+  }
+});
+
+// TODO: /{process.env.SERVICE_NAME}/hook/{teamId}. Use this
+// path to handle hooks from 3rd party services
+router.post('/:service/hook/:teamId', async (req: Request, res: Response) => {
+  const { service, teamId } = req.params;
+  console.log(
+    `===>HOOK BODY of service: ${service} team: ${teamId}`,
+    JSON.stringify(req.body),
+  );
 
   // Find hook to send data to
   const hookRet = await getTeamHook(teamId);

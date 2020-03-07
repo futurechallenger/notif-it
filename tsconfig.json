@@ -22,7 +22,8 @@
     "paths": {
       "@src/*": ["src/*"],
       "@services/*": ["src/services/*"],
-      "@util/*": ["src/util/*"]
+      "@util/*": ["src/util/*"],
+      "@lib/*": ["src/lib/*"]
     }
   },
   // "exclude": ["**/*.js"]
