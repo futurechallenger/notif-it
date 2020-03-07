@@ -12,6 +12,7 @@ import {
 import { EventHook, parseEvents } from './services/eventService';
 import { parseAction } from './services/trelloService';
 import { appName, expiration, scope, trelloHost } from './util/config';
+import { Config } from '@lib/config';
 
 type Request = Express.Request;
 type Response = Express.Response;
@@ -24,7 +25,18 @@ const host =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:8333'
     : process.env.PROJECT_DOMAIN;
-const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
+// const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
+const config = new Config();
+const authUrl = config.getOAuth2URL({
+  serviceURL: `${trelloHost}authorize`,
+  scopes: ['read'],
+  returnURL: `${host}/callback`,
+  responseType: 'token',
+  clientId: 'tkey',
+  clientIDAlias: 'key',
+  name: process.env.APP_NAME || 'My App',
+  expiration: 'never',
+});
 
 router.get('/', (_: Request, res: Response) => {
   res.render('index');
@@ -242,33 +254,33 @@ router.post('/trello/hook/:teamId', async (req: Request, res: Response) => {
 
 // TODO: /{process.env.SERVICE_NAME}/hook/{teamId}. Use this
 // path to handle hooks from 3rd party services
-router.post('/:service/hook/:teamId', async (req: Request, res: Response) => {
-  const { service, teamId } = req.params;
-  console.log(
-    `===>HOOK BODY of service: ${service} team: ${teamId}`,
-    JSON.stringify(req.body),
-  );
+// router.post('/:service/hook/:teamId', async (req: Request, res: Response) => {
+//   const { service, teamId } = req.params;
+//   console.log(
+//     `===>HOOK BODY of service: ${service} team: ${teamId}`,
+//     JSON.stringify(req.body),
+//   );
 
-  // Find hook to send data to
-  const hookRet = await getTeamHook(teamId);
-  const messageHook = get(hookRet, 'hook', null);
-  if (!messageHook) {
-    throw new Error('Cannot get team Id to proceed');
-  }
+//   // Find hook to send data to
+//   const hookRet = await getTeamHook(teamId);
+//   const messageHook = get(hookRet, 'hook', null);
+//   if (!messageHook) {
+//     throw new Error('Cannot get team Id to proceed');
+//   }
 
-  try {
-    const hookRet = req.body;
-    const hookNormalized = parseAction(hookRet);
+//   try {
+//     const hookRet = req.body;
+//     const hookNormalized = parseAction(hookRet);
 
-    const ret = await Axios.post(messageHook, hookNormalized);
+//     const ret = await Axios.post(messageHook, hookNormalized);
 
-    console.log('===>POST RET', ret);
+//     console.log('===>POST RET', ret);
 
-    res.status(200).json({ status: 'OK' });
-  } catch (e) {
-    console.error('ERROR: ', e);
-    res.status(200).json({ message: e.message });
-  }
-});
+//     res.status(200).json({ status: 'OK' });
+//   } catch (e) {
+//     console.error('ERROR: ', e);
+//     res.status(200).json({ message: e.message });
+//   }
+// });
 
 export { router };
