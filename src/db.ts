@@ -42,6 +42,12 @@ async function query(sql: string, values?: any[]): Promise<any | undefined> {
   }
 }
 
+async function getTokenByRid(id: number): Promise<any | null> {
+  const ret = await query('select tk from team where id=$1', [id]);
+  console.log('GET TOKEN ret: ', ret);
+  return ret.rowCount > 0 ? ret.rows[0] : null;
+}
+
 async function getTeamToken(teamId: string): Promise<any | null> {
   const ret = await query('select tk from team where teamId=$1', [teamId]);
   console.log('GET TOKEN ret: ', ret);
@@ -66,7 +72,7 @@ async function setTeamHook(teamId: string, hook: string): Promise<boolean> {
 async function storeToken(teamId: string, token: string): Promise<number> {
   const client = await pool.connect();
   try {
-    const ret = await client.query('select 1 from team where teamId=$1', [
+    const ret = await client.query('select id from team where teamId=$1', [
       teamId,
     ]);
 
@@ -95,6 +101,38 @@ async function storeToken(teamId: string, token: string): Promise<number> {
   return -1;
 }
 
+async function storeTokenByID(
+  teamId: string,
+  token: string,
+  id?: number,
+): Promise<number | null> {
+  const client = await pool.connect();
+  try {
+    let opRet;
+
+    if (!id) {
+      // Insert
+      opRet = await client.query(
+        'insert into team (teamId, tk, createdAt) values ($1, $2, $3) returning id',
+        [teamId, token, +moment.utc().format('X')],
+      );
+      return opRet.rowCount > 0 ? opRet.rows[0].id : null;
+    } else {
+      opRet = await client.query(
+        `update team set tk=$1, updatedAt=$2, teamId=$3 where id='${id}`,
+        [token, +moment.utc().format('X'), teamId],
+      );
+      return opRet.rowCount > 0 ? id : null;
+    }
+  } catch (e) {
+    console.error('OP ERROR', e);
+  } finally {
+    client.release();
+  }
+
+  return null;
+}
+
 async function storeEnvets(teamId: string, events: string[]): Promise<number> {
   const ret = await query(
     'update team set events=$1, updatedAt=$2 where teamId=$3',
@@ -115,9 +153,11 @@ async function getTeamEvents(teamId: string): Promise<any | null> {
 export {
   query,
   storeToken,
+  storeTokenByID,
   getTeamEvents,
   storeEnvets,
   getTeamToken,
   getTeamHook,
   setTeamHook,
+  getTokenByRid,
 };

@@ -1,21 +1,22 @@
+import { Config } from '@lib/config';
 import Axios from 'axios';
 import * as dotenv from 'dotenv';
 import * as Express from 'express';
+import * as jwt from 'jsonwebtoken';
 import { get } from 'lodash';
 import {
   getTeamEvents,
   getTeamHook,
   getTeamToken,
   storeEnvets,
-  storeToken,
+  storeTokenByID,
+  getTokenByRid,
 } from './db';
 import { EventHook, parseEvents } from './services/eventService';
 import { parseAction } from './services/trelloService';
-import { appName, expiration, scope, trelloHost } from './util/config';
-import { Config } from '@lib/config';
+import { trelloHost } from './util/config';
 
-type Request = Express.Request;
-type Response = Express.Response;
+import { Request, Response } from './types';
 
 dotenv.config();
 
@@ -43,25 +44,29 @@ router.get('/', (_: Request, res: Response) => {
 });
 
 router.get('/auth', async (_: Request, res: Response) => {
+  // TODO: get service and team Id maybe, service is a must
+  // TODO: Generate auth url corresponding to the service
   res.redirect(authUrl);
 });
 
 router.post('/auth', async (req: Request, res: Response) => {
-  const { teamId } = req.body;
   try {
-    if (!teamId) {
-      throw new Error('Invalid teamId');
+    if (!req.decoded.rtk) {
+      throw new Error('not authed');
     }
+
+    const { rid, teamId } = req.decoded;
     // TODO: if `tk` exists, this team is authed. No need to do the 3rd-service auth again
-    const ret = await getTeamToken(teamId);
+    const ret = await getTokenByRid(rid);
+
     if (!ret) {
       throw new Error('No token found');
     }
     res.json({ teamId });
   } catch (e) {
     const message = e.message;
-    if (message === 'Invalid teamId') {
-      res.status(403).json({ status: 'invalid team ID' });
+    if (message === 'not authed') {
+      res.status(403).json({ status: 'not authed' });
       return;
     }
     if (message === 'No token found') {
@@ -82,14 +87,22 @@ router.get('/callback', async (req: Request, res: Response) => {
 
 router.post('/callback', async (req: Request, res: Response) => {
   try {
+    // rid: record id
     const { t, teamId } = req.body;
+    const { rid = null, teamId: payloadTeamId = null } = req.decoded;
 
-    const ret = await storeToken(teamId, t);
-    if (ret <= 0) {
+    console.log(
+      `===>/callback, TeamID ${teamId}, payload teamId ${payloadTeamId}`,
+    );
+
+    const ret = await storeTokenByID(teamId, t, rid);
+    if (!ret) {
       throw new Error('DB error to keep tk');
     }
 
-    res.json({ status: 'OK' });
+    // TODO: We dont have to sign every call of this api
+    const encodedKey = jwt.sign({ rid: ret, teamId }, process.env.JWT_SALT);
+    res.json({ status: 'OK', rtk: encodedKey });
   } catch (e) {
     console.error('ERROR: ', e);
     res.status(500).json({ message: 'Failed' });

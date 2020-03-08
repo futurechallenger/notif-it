@@ -9,6 +9,7 @@ async function getTeamStatus(teamId: string): Promise<boolean | null> {
   }
 
   console.log('===>status ret', data);
+
   return data;
 }
 

@@ -8,6 +8,8 @@ import * as cors from 'cors';
 import * as path from 'path';
 import { router } from './routes';
 import * as ejs from 'ejs';
+import { Request, Response, NextFunction, DecodedType } from './types';
+import * as jwt from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -29,6 +31,27 @@ app.use(
 app.use(cors());
 app.use(bodyParser());
 app.use(compression());
+
+app.use((req: Request, _: Response, next: NextFunction) => {
+  try {
+    const rtk = req.body.rtk || req.query.rtk;
+    if (!rtk) {
+      next();
+    }
+
+    const decoded: DecodedType = jwt.verify(
+      rtk,
+      process.env.JWT_SALT,
+    ) as DecodedType;
+    decoded.rtk = rtk;
+    (req as any).decoded = decoded || {};
+
+    next();
+  } catch (e) {
+    console.error('===>Middleware decode rtk error', e);
+    next(e);
+  }
+});
 
 // routes
 app.use(router);
