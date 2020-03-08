@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { host, authUrl } from './util/config';
 import Axios from 'axios';
 import { Route, Redirect } from 'react-router-dom';
+import qs from 'qs';
 
 interface AuthButtonProps {
   title: string;
@@ -25,8 +26,22 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({
       }
 
       try {
-        const teamId = localStorage.getItem('__teamId');
-        const ret = await Axios.post(`${host}/callback`, { t: param, teamId });
+        // TODO: get team id, service from location.href
+        const url = window.location.href;
+        if (url.indexOf('?') <= 0) {
+          console.error('===>Can not get teamId and appType');
+          return;
+        }
+
+        const queryString = url.split('?')[1].replace(/#\/\w*/g, '');
+        const parsed = qs.parse(queryString);
+
+        const { teamId, appType } = parsed;
+        const ret = await Axios.post(`${host}/callback`, {
+          t: param,
+          teamId,
+          sn: appType,
+        });
         console.log('token', ret);
         history.replace('/');
       } catch (e) {

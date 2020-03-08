@@ -104,8 +104,9 @@ async function storeToken(teamId: string, token: string): Promise<number> {
 async function storeTokenByID(
   teamId: string,
   token: string,
+  service: string,
   id?: number,
-): Promise<number | null> {
+): Promise<{ id: number } | null> {
   const client = await pool.connect();
   try {
     let opRet;
@@ -113,8 +114,8 @@ async function storeTokenByID(
     if (!id) {
       // Insert
       opRet = await client.query(
-        'insert into team (teamId, tk, createdAt) values ($1, $2, $3) returning id',
-        [teamId, token, +moment.utc().format('X')],
+        'insert into team (teamId, tk, service, createdAt) values ($1, $2, $3, $4) returning id',
+        [teamId, token, service, +moment.utc().format('X')],
       );
       return opRet.rowCount > 0 ? opRet.rows[0].id : null;
     } else {
@@ -122,7 +123,7 @@ async function storeTokenByID(
         `update team set tk=$1, updatedAt=$2, teamId=$3 where id='${id}`,
         [token, +moment.utc().format('X'), teamId],
       );
-      return opRet.rowCount > 0 ? id : null;
+      return opRet.rowCount > 0 ? { id } : null;
     }
   } catch (e) {
     console.error('OP ERROR', e);

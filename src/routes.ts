@@ -62,7 +62,7 @@ router.post('/auth', async (req: Request, res: Response) => {
     if (!ret) {
       throw new Error('No token found');
     }
-    res.json({ teamId });
+    res.json({ status: 'OK' });
   } catch (e) {
     const message = e.message;
     if (message === 'not authed') {
@@ -87,15 +87,14 @@ router.get('/callback', async (req: Request, res: Response) => {
 
 router.post('/callback', async (req: Request, res: Response) => {
   try {
-    // rid: record id
-    const { t, teamId } = req.body;
+    const { t, teamId, sn: service } = req.body;
     const { rid = null, teamId: payloadTeamId = null } = req.decoded;
 
     console.log(
       `===>/callback, TeamID ${teamId}, payload teamId ${payloadTeamId}`,
     );
 
-    const ret = await storeTokenByID(teamId, t, rid);
+    const ret = await storeTokenByID(payloadTeamId, t, service, rid);
     if (!ret) {
       throw new Error('DB error to keep tk');
     }
