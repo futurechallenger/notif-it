@@ -49,13 +49,26 @@ router.get('/auth', async (_: Request, res: Response) => {
 router.post('/auth', async (req: Request, res: Response) => {
   const { teamId } = req.body;
   try {
+    if (!teamId) {
+      throw new Error('Invalid teamId');
+    }
     // TODO: if `tk` exists, this team is authed. No need to do the 3rd-service auth again
     const ret = await getTeamToken(teamId);
     if (!ret) {
-      res.json({ teamId });
+      throw new Error('No token found');
     }
     res.json({ teamId });
   } catch (e) {
+    const message = e.message;
+    if (message === 'Invalid teamId') {
+      res.status(403).json({ status: 'invalid team ID' });
+      return;
+    }
+    if (message === 'No token found') {
+      res.status(401).json({ status: 'not authed' });
+      return;
+    }
+
     console.error('===>post auth error', e);
     res.status(500).json({ teamId: null });
   }
