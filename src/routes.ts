@@ -32,7 +32,7 @@ const authUrl = config.getOAuth2URL({
   scopes: ['read'],
   returnURL: `${host}/callback`,
   responseType: 'token',
-  clientId: 'tkey',
+  clientId: process.env.TRELLO_KEY,
   clientIDAlias: 'key',
   name: process.env.APP_NAME || 'My App',
   expiration: 'never',
