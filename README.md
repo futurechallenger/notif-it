@@ -3,5 +3,7 @@
 ### TODO:
 
 - [ ] JWT for security
-- [ ] Update board list
-- [ ] Message
+- [ ] Multiple service suport
+- [ ] Message translating engine
+- [x] Update board list
+- [x] Message
