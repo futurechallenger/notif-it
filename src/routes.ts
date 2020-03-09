@@ -27,6 +27,7 @@ const host =
     : process.env.PROJECT_DOMAIN;
 // const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
 const config = new Config();
+// TODO: Need a place to setup app name
 const authUrl = config.getOAuth2URL({
   serviceURL: process.env.TRELLO_HOST, // TODO: use the auth host by configured service and get the host from env var
   scopes: ['read'],
