@@ -4,4 +4,6 @@ const host =
     : 'https://j-int.herokuapp.com'; // TODO: request trello to get boards
 const authUrl = `${host}/auth`;
 
-export { host, authUrl };
+const UNIQUE_ID_NAME = '__rid';
+
+export { host, authUrl, UNIQUE_ID_NAME };

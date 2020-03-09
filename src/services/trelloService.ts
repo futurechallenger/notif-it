@@ -1,20 +1,33 @@
-import Axios from 'axios';
+import { get } from 'lodash';
 
-function parseAction(payload: any) {
+/**
+ * Event filter is now based on board, not actions in a board
+ * @param payload returned from 3rd service
+ * @param events model ID list formated likt xxx,xxx
+ */
+function parseAction(payload: any, events?: string) {
   // const getAtMentionText=() =>{
   //   return _.unescape(Remove_Markdown(this.get('activity').replace(/\n/g, ' ')));
   // },
 
+  // TODO: What to post to return when there's no events source subscribed
+  if (!events) {
+    return;
+  }
+
   this.payload = payload;
+  this.events = events || '';
 
   /**
    * Filter if the event is subscribed
+   * oldEN: this param maybe deprecated
    */
-  const canPost = (eventName: string): boolean => {
-    console.log('===Subscribed event is ', eventName);
-    const can_post = true;
-    //TODO: Loop subscribed events to check if the event is subscribed
-    return can_post;
+  const canPost = (oldEN: string): boolean => {
+    console.log('==>Old event name is', oldEN);
+    console.log('==>Subscribed events', this.events);
+
+    const eventName = get(this.payload, 'model.id', null);
+    return this.events.indexOf(eventName) >= 0;
   };
 
   /**

@@ -1,9 +1,10 @@
 import React from 'react';
 import { RouterButton } from './components/RouterButton';
 import { useHistory } from 'react-router-dom';
-import { host, authUrl } from './util/config';
+import { host, authUrl, UNIQUE_ID_NAME } from './util/config';
 import Axios from 'axios';
 import { Route, Redirect } from 'react-router-dom';
+import qs from 'qs';
 
 interface AuthButtonProps {
   title: string;
@@ -25,9 +26,30 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({
       }
 
       try {
-        const teamId = localStorage.getItem('__teamId');
-        const ret = await Axios.post(`${host}/callback`, { t: param, teamId });
+        // TODO: get team id, service from location.href
+        const url = window.location.href;
+        if (url.indexOf('?') <= 0) {
+          console.error('===>Can not get teamId and appType');
+          return;
+        }
+
+        const queryString = url.split('?')[1].replace(/#\/\w*/g, '');
+        const parsed = qs.parse(queryString);
+
+        const { teamId, appType } = parsed;
+        const ret = await Axios.post(`${host}/callback`, {
+          t: param,
+          teamId,
+          sn: appType,
+        });
         console.log('token', ret);
+        if (!ret) {
+          // TODO: notify users there're something wrong with the auth
+          console.error('no token returned');
+          return;
+        }
+
+        localStorage.setItem(UNIQUE_ID_NAME, ret.data.rtk);
         history.replace('/');
       } catch (e) {
         console.error('error', e);
