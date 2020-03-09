@@ -1,10 +1,6 @@
-import { makeStyles } from '@material-ui/core';
-import qs from 'qs';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
-import { BoardType } from './BoardCheckbox';
 import { BoardList } from './BoardList';
-import { getTeamStatus } from './services/status';
 
 interface SourcePageProps {
   status: string;

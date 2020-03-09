@@ -42,14 +42,14 @@ async function query(sql: string, values?: any[]): Promise<any | undefined> {
   }
 }
 
-async function getTokenByRid(id: number): Promise<any | null> {
-  const ret = await query('select tk from team where id=$1', [id]);
+async function getTeamToken(teamId: string): Promise<any | null> {
+  const ret = await query('select tk from team where teamId=$1', [teamId]);
   console.log('GET TOKEN ret: ', ret);
   return ret.rowCount > 0 ? ret.rows[0] : null;
 }
 
-async function getTeamToken(teamId: string): Promise<any | null> {
-  const ret = await query('select tk from team where teamId=$1', [teamId]);
+async function getTokenByRID(rid: number): Promise<any | null> {
+  const ret = await query('select tk from team where id=$1', [rid]);
   console.log('GET TOKEN ret: ', ret);
   return ret.rowCount > 0 ? ret.rows[0] : null;
 }
@@ -151,6 +151,24 @@ async function getTeamEvents(teamId: string): Promise<any | null> {
   return null;
 }
 
+async function getEventsByRID(rid: number): Promise<any | null> {
+  const ret = await query('select events from team where id=$1', [rid]);
+  if (ret.rowCount > 0) {
+    return ret.rows[0];
+  }
+  return null;
+}
+
+async function getEventsHookByRID(rid: number): Promise<any | null> {
+  try {
+    const ret = await query('select events, hook from team where id=$1', [rid]);
+    return ret.rowCount > 0 ? ret.rows[0] : null;
+  } catch (e) {
+    console.error('ERROR in getting events and hook', e);
+    return null;
+  }
+}
+
 export {
   query,
   storeToken,
@@ -160,5 +178,7 @@ export {
   getTeamToken,
   getTeamHook,
   setTeamHook,
-  getTokenByRid,
+  getEventsByRID,
+  getEventsHookByRID,
+  getTokenByRID,
 };

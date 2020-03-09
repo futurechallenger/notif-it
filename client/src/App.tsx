@@ -1,30 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import './App.css';
 import { AuthButton } from './AuthButton';
-import { SourcePage } from './SourcePage';
 import { getTeamStatus } from './services/status';
-import qs from 'qs';
+import { SourcePage } from './SourcePage';
+import { UNIQUE_ID_NAME } from './util/config';
 
 const App = () => {
   const [status, setStatus] = useState('INIT');
   // TODO: Team ID may from a part of a url
   useEffect(() => {
-    const requestUrl = window.location.href;
+    // const requestUrl = window.location.href;
 
-    if (requestUrl.indexOf('teamId') < 0) {
-      console.error('teamd id is missed');
-      setStatus('NOT_AUTHED');
-      return;
-    }
+    // if (requestUrl.indexOf('teamId') < 0) {
+    //   console.error('teamd id is missed');
+    //   setStatus('NOT_AUTHED');
+    //   return;
+    // }
 
-    const parsed = qs.parse(window.location.href);
-    const teamId = parsed[Object.keys(parsed)[0]].replace(/#\/\w*/g, '');
-    // teamId = teamId.split('=')[1];
-    localStorage.setItem('__teamId', teamId);
+    // const parsed = qs.parse(window.location.href);
+    // const teamId = parsed[Object.keys(parsed)[0]].replace(/#\/\w*/g, '');
+    // // teamId = teamId.split('=')[1];
+    // localStorage.setItem('__teamId', teamId);
 
     const fetchStatus = async () => {
-      const ret = await getTeamStatus(teamId);
+      const rtk = localStorage.getItem(UNIQUE_ID_NAME);
+      if (!rtk) {
+        setStatus('NOT_AUTHED');
+        return;
+      }
+
+      const ret = await getTeamStatus(rtk);
       if (!ret) {
         setStatus('NOT_AUTHED');
         return;

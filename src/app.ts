@@ -37,16 +37,16 @@ app.use((req: Request, _: Response, next: NextFunction) => {
     const rtk = req.body.rtk || req.query.rtk;
     if (!rtk) {
       next();
+    } else {
+      const decoded: DecodedType = jwt.verify(
+        rtk,
+        process.env.JWT_SALT,
+      ) as DecodedType;
+      decoded.rtk = rtk;
+      (req as any).decoded = decoded || {};
+
+      next();
     }
-
-    const decoded: DecodedType = jwt.verify(
-      rtk,
-      process.env.JWT_SALT,
-    ) as DecodedType;
-    decoded.rtk = rtk;
-    (req as any).decoded = decoded || {};
-
-    next();
   } catch (e) {
     console.error('===>Middleware decode rtk error', e);
     next(e);

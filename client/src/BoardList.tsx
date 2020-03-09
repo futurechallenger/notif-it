@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { BoardCheckbox, BoardType } from './BoardCheckbox';
 import { getBoardsList } from './services/boards';
 import { subscribeEvents } from './services/subscribeEvents';
+import { UNIQUE_ID_NAME } from './util/config';
 
 type ActionType = {
   boards: BoardType[];
@@ -123,7 +124,7 @@ const BoardList = () => {
   const handleSubscribe = useCallback(() => {
     const subscribe = async () => {
       setSubscribeStatus('subscribing');
-      const teamId = localStorage.getItem('__teamId');
+      const teamId = localStorage.getItem(UNIQUE_ID_NAME);
       // TODO: deal with empty team ID
       const ret = await subscribeEvents(teamId || '', selectedBoards);
       console.log('===>Sub ret', ret);
@@ -149,6 +150,7 @@ const BoardList = () => {
       <Button variant="outlined" color="primary" onClick={handleSubscribe}>
         Save
       </Button>
+      <span>{subscribeStatus}</span>
     </div>
   );
 };

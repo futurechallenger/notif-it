@@ -1,7 +1,7 @@
 import React from 'react';
 import { RouterButton } from './components/RouterButton';
 import { useHistory } from 'react-router-dom';
-import { host, authUrl } from './util/config';
+import { host, authUrl, UNIQUE_ID_NAME } from './util/config';
 import Axios from 'axios';
 import { Route, Redirect } from 'react-router-dom';
 import qs from 'qs';
@@ -43,6 +43,13 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({
           sn: appType,
         });
         console.log('token', ret);
+        if (!ret) {
+          // TODO: notify users there're something wrong with the auth
+          console.error('no token returned');
+          return;
+        }
+
+        localStorage.setItem(UNIQUE_ID_NAME, ret.data.rtk);
         history.replace('/');
       } catch (e) {
         console.error('error', e);
