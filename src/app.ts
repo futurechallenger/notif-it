@@ -11,6 +11,7 @@ import * as ejs from 'ejs';
 import { Request, Response, NextFunction, DecodedType } from './types';
 import * as jwt from 'jsonwebtoken';
 
+// load dotenv
 dotenv.config();
 
 // APP
