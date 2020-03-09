@@ -37,6 +37,7 @@ app.use((req: Request, _: Response, next: NextFunction) => {
   try {
     const rtk = req.body.rtk || req.query.rtk;
     if (!rtk) {
+      (req as any).decoded = {};
       next();
     } else {
       const decoded: DecodedType = jwt.verify(
