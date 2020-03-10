@@ -3,11 +3,11 @@ import { host } from '../util/config';
 import { BoardType } from 'src/BoardCheckbox';
 
 async function getBoardsList(
-  teamId: string,
+  rid: string,
 ): Promise<{ boards: BoardType[]; selected: string[] } | null> {
-  const { status, data } = await Axios.get(`${host}/events/${teamId}`);
+  const { status, data } = await Axios.get(`${host}/events/${rid}`);
   if (status !== 200) {
-    console.error('===>Error to get events');
+    console.error('===>Error to get events', { status, data });
     return null;
   }
 
