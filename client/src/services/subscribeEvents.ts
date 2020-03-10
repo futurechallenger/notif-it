@@ -4,7 +4,7 @@ import Axios from 'axios';
 /**
  * Put events to server
  */
-async function subscribeEvents(teamId: string, events: string[]) {
+async function subscribeEvents(rtk: string, events: string[]) {
   console.log('Subscribed events', events);
   try {
     const data =
@@ -16,7 +16,11 @@ async function subscribeEvents(teamId: string, events: string[]) {
             '5b5fb692b996f95b67b8684c',
           ]
         : events;
-    const ret = await Axios.post(`${host}/subscribe`, { teamId, events: data });
+    const ret = await Axios.post(
+      `${host}/subscribe`,
+      { events: data },
+      { headers: { 'x-api-payload': rtk } },
+    );
     console.log('==>RET', ret);
     if (ret.status !== 200) {
       console.error('ERROR subscribe events', ret);
