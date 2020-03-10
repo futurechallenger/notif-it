@@ -60,6 +60,12 @@ async function getTeamHook(teamId: string): Promise<string | null> {
   return ret.rowCount > 0 ? ret.rows[0] : null;
 }
 
+async function getHookByRID(rid: number): Promise<any | null> {
+  const ret = await query('select hook from team where id=$1', [rid]);
+  console.log('==>get the hook result: ', ret);
+  return ret.rowCount > 0 ? ret.rows[0] : null;
+}
+
 async function setTeamHook(teamId: string, hook: string): Promise<boolean> {
   const ret = await query('update team set hook=$1 where teamId=$2', [
     hook,
@@ -143,6 +149,18 @@ async function storeEnvets(teamId: string, events: string[]): Promise<number> {
   return ret.rowCount;
 }
 
+async function storeEnvetsByRID(
+  rid: number,
+  events: string[],
+): Promise<number> {
+  const ret = await query(
+    'update team set events=$1, updatedAt=$2 where id=$3',
+    [events.join(','), +moment.utc().format('X'), rid],
+  );
+
+  return ret.rowCount;
+}
+
 async function getTeamEvents(teamId: string): Promise<any | null> {
   const ret = await query('select events from team where teamId=$1', [teamId]);
   if (ret.rowCount > 0) {
@@ -181,4 +199,6 @@ export {
   getEventsByRID,
   getEventsHookByRID,
   getTokenByRID,
+  getHookByRID,
+  storeEnvetsByRID,
 };

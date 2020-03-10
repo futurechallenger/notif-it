@@ -7,12 +7,12 @@ import { get } from 'lodash';
 import {
   getEventsByRID,
   getEventsHookByRID,
-  getTeamToken,
   getTokenByRID,
   storeEnvets,
   storeTokenByID,
+  storeEnvetsByRID,
 } from './db';
-import { EventHook, parseEvents } from './services/eventService';
+import { EventHook, parseEventsByRID } from './services/eventService';
 import { parseAction } from './services/trelloService';
 import { Request, Response } from './types';
 import { trelloHost } from './util/config';
@@ -140,10 +140,9 @@ router.get('/events', async (req: Request, res: Response) => {
     console.log('===>Selected events', selRet);
 
     // TODO: get selected boards for updating
-
     res.json({
       boards: boardsInfo.data,
-      selected: selRet.events.split(','),
+      selected: (selRet.events && selRet.events.split(',')) || '',
     });
   } catch (e) {
     console.error('ERROR: ', e);
@@ -153,26 +152,29 @@ router.get('/events', async (req: Request, res: Response) => {
 
 router.post('/subscribe', async (req: Request, res: Response) => {
   try {
-    const { teamId, events } = req.body;
+    const { events } = req.body;
+    const { rid } = req.decoded;
+
     console.log('==>Events', events);
+    console.log('==>RID', rid, req.decoded);
 
     // Store events
-    const ret = await storeEnvets(teamId, events);
+    const ret = await storeEnvetsByRID(rid, events);
     if (ret <= 0) {
       throw new Error('DB error in keep events');
     }
 
     // get token
-    console.log('===>events team id:', teamId);
-    const tokenRet = await getTeamToken(teamId);
-    const token = get(tokenRet, ['tk'], null);
+    console.log('===>events team id:', rid);
+    const tokenRet = await getTokenByRID(rid);
+    const token = get(tokenRet, 'tk', null);
     if (!token) {
       throw new Error('Cannot get token for team');
     }
 
     //TODO: Set / update hook
     // 1. get parsed events
-    const parsedEvents: EventHook[] = await parseEvents(teamId, events);
+    const parsedEvents: EventHook[] = await parseEventsByRID(teamId, events);
     console.log('==>Parsed events', parsedEvents);
 
     let promises = [];
