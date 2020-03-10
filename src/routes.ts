@@ -140,10 +140,9 @@ router.get('/events', async (req: Request, res: Response) => {
     console.log('===>Selected events', selRet);
 
     // TODO: get selected boards for updating
-
     res.json({
       boards: boardsInfo.data,
-      selected: selRet.events.split(','),
+      selected: (selRet.events && selRet.events.split(',')) || '',
     });
   } catch (e) {
     console.error('ERROR: ', e);
