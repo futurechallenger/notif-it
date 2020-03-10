@@ -111,7 +111,8 @@ router.post('/callback', async (req: Request, res: Response) => {
 // TODO: use cache to reduce db query
 router.get('/events/:rid', async (req: Request, res: Response) => {
   try {
-    const rid = req.params.rid;
+    // const rid = req.params.rid;
+    const { rid } = req.decoded;
     console.log('===>events id:', rid);
 
     const tokenRet = await getTokenByRID(+rid);
