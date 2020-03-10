@@ -56,7 +56,11 @@ const App = () => {
               <SourcePage status={status} />
             </Route>
             <Route path="/auth">
-              <AuthButton title="Auth" status={status} />
+              <AuthButton
+                title="Auth"
+                status={status}
+                handleStatus={setStatus}
+              />
             </Route>
           </Switch>
         </div>
