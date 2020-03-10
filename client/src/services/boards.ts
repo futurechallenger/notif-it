@@ -5,7 +5,10 @@ import { BoardType } from 'src/BoardCheckbox';
 async function getBoardsList(
   rid: string,
 ): Promise<{ boards: BoardType[]; selected: string[] } | null> {
-  const { status, data } = await Axios.get(`${host}/events/${rid}`);
+  // const { status, data } = await Axios.get(`${host}/events/${rid}`);
+  const { status, data } = await Axios.get(`${host}/events`, {
+    headers: { 'x-api-payload': rid },
+  });
   if (status !== 200) {
     console.error('===>Error to get events', { status, data });
     return null;
