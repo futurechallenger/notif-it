@@ -1,6 +1,6 @@
 import Axios from 'axios';
 import { trelloHost } from '@util/config';
-import { getTeamToken } from '@src/db';
+import { getTeamToken, getTokenByRID } from '@src/db';
 import { each, find, difference } from 'lodash';
 
 interface EventHook {
@@ -17,7 +17,13 @@ interface WebHookType {
   active?: boolean;
 }
 
-async function getEventHooks(token: string): Promise<WebHookType[] | null> {
+/**
+ * Get events from remote server
+ * @param token  token of the service
+ */
+async function getEventHooksFromRemote(
+  token: string,
+): Promise<WebHookType[] | null> {
   const ret = await Axios.get(
     `${trelloHost}tokens/${token}/webhooks?key=${process.env.TRELLO_KEY}`,
   );
@@ -38,7 +44,30 @@ async function parseEvents(
       return null;
     }
     const token = tkRet.tk;
-    const currentHooks = await getEventHooks(token);
+    const currentHooks = await getEventHooksFromRemote(token);
+
+    // No existing webhooks
+    if (!currentHooks || currentHooks.length === 0) {
+      return dest.map((eId: string) => ({ eventId: eId, action: 'post' }));
+    }
+
+    return compareEvents(dest, currentHooks);
+  } catch (e) {
+    console.error('==>parse events error: ', e);
+  }
+}
+
+async function parseEventsByRID(
+  rid: number,
+  dest: string[],
+): Promise<EventHook[] | null> {
+  try {
+    const tkRet = await getTokenByRID(rid);
+    if (!tkRet) {
+      return null;
+    }
+    const token = tkRet.tk;
+    const currentHooks = await getEventHooksFromRemote(token);
 
     // No existing webhooks
     if (!currentHooks || currentHooks.length === 0) {
@@ -76,4 +105,4 @@ function compareEvents(
   return result;
 }
 
-export { EventHook, WebHookType, parseEvents, compareEvents };
+export { EventHook, WebHookType, parseEvents, compareEvents, parseEventsByRID };
