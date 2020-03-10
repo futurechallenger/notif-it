@@ -35,7 +35,7 @@ app.use(compression());
 
 app.use((req: Request, _: Response, next: NextFunction) => {
   try {
-    const rtk = req.body.rtk || req.params.rtk || req.query.rtk;
+    const rtk = req.headers['x-api-payload'] || req.body.rtk || req.query.rtk;
     if (!rtk) {
       (req as any).decoded = {};
       next();
