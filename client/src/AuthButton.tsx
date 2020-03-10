@@ -9,11 +9,13 @@ import qs from 'qs';
 interface AuthButtonProps {
   title: string;
   status: string;
+  handleStatus: (s: string) => void;
 }
 
 const AuthButton: React.FunctionComponent<AuthButtonProps> = ({
   title,
   status,
+  handleStatus,
 }) => {
   const history = useHistory();
 
@@ -36,20 +38,21 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({
         const queryString = url.split('?')[1].replace(/#\/\w*/g, '');
         const parsed = qs.parse(queryString);
 
-        const { teamId, appType } = parsed;
+        const { teamId, apptype } = parsed;
         const ret = await Axios.post(`${host}/callback`, {
           t: param,
           teamId,
-          sn: appType,
+          sn: apptype,
         });
         console.log('token', ret);
-        if (!ret) {
+        if (!ret || ret.status !== 200) {
           // TODO: notify users there're something wrong with the auth
           console.error('no token returned');
           return;
         }
 
         localStorage.setItem(UNIQUE_ID_NAME, ret.data.rtk);
+        handleStatus('AUTHED');
         history.replace('/');
       } catch (e) {
         console.error('error', e);
