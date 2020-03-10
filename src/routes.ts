@@ -245,7 +245,7 @@ router.post('/service/hook/:rid', async (req: Request, res: Response) => {
   const messageHook = get(hookRet, 'hook', null);
   const events = get(hookRet, 'events', null);
   if (!messageHook) {
-    throw new Error('Cannot get team Id to proceed');
+    throw new Error('Cannot get platform HOOK to proceed');
   }
 
   try {
