@@ -8,21 +8,8 @@ import { UNIQUE_ID_NAME } from './util/config';
 
 const App = () => {
   const [status, setStatus] = useState('INIT');
-  // TODO: Team ID may from a part of a url
+  // TODO: team id and app type as a part of the url
   useEffect(() => {
-    // const requestUrl = window.location.href;
-
-    // if (requestUrl.indexOf('teamId') < 0) {
-    //   console.error('teamd id is missed');
-    //   setStatus('NOT_AUTHED');
-    //   return;
-    // }
-
-    // const parsed = qs.parse(window.location.href);
-    // const teamId = parsed[Object.keys(parsed)[0]].replace(/#\/\w*/g, '');
-    // // teamId = teamId.split('=')[1];
-    // localStorage.setItem('__teamId', teamId);
-
     const fetchStatus = async () => {
       const rtk = localStorage.getItem(UNIQUE_ID_NAME);
       if (!rtk) {
@@ -42,7 +29,6 @@ const App = () => {
     fetchStatus();
   }, []);
   return (
-    // <Router>
     <div className="App">
       <header className="App-header">
         <div
@@ -66,7 +52,6 @@ const App = () => {
         </div>
       </header>
     </div>
-    // </Router>
   );
 };
 

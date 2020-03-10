@@ -38,11 +38,9 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({
         const queryString = url.split('?')[1].replace(/#\/\w*/g, '');
         const parsed = qs.parse(queryString);
 
-        const { teamId, apptype } = parsed;
         const ret = await Axios.post(`${host}/callback`, {
           t: param,
-          teamId,
-          sn: apptype,
+          ...parsed,
         });
         console.log('token', ret);
         if (!ret || ret.status !== 200) {

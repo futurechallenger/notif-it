@@ -86,9 +86,10 @@ router.get('/callback', async (req: Request, res: Response) => {
 
 router.post('/callback', async (req: Request, res: Response) => {
   try {
-    const { t, teamId, sn: service } = req.body;
+    const { t, teamId, apptype: service } = req.body;
     const { rid = null, teamId: payloadTeamId = null } = req.decoded;
 
+    console.log('===>/callback, REQ BODY', req.body);
     console.log(
       `===>/callback, TeamID ${teamId}, payload teamId ${payloadTeamId}`,
     );
