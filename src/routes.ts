@@ -181,23 +181,14 @@ router.post('/subscribe', async (req: Request, res: Response) => {
     let promises: Promise<any>[] = [];
     if (parsedEvents && parsedEvents.length > 0) {
       parsedEvents.forEach(({ eventId, hookId, action }: EventHook) => {
-        if (action === 'put') {
-          return;
-        }
-
         let url;
         if (action === 'post') {
           url = `${trelloHost}webhooks/?idModel=${eventId}&description="My Webhook"&callbackURL=${process.env.PROJECT_DOMAIN}/service/hook/${rid}&key=${process.env.TRELLO_KEY}&token=${token}`;
         } else if (action === 'delete') {
           url = `${trelloHost}webhooks/${hookId}?key=${process.env.TRELLO_KEY}&token=${token}`;
         } else {
-          //TODO: No need to put for the same team
-          // url = `${trelloHost}webhooks/${hookId}?description="My Webhook"&key=${process.env.TRELLO_KEY}&token=${token}`;
+          url = `${trelloHost}webhooks/${hookId}?description="My Webhook"&key=${process.env.TRELLO_KEY}&token=${token}`;
         }
-        // const ret = await Axios({
-        //   method: action,
-        //   url,
-        // });
 
         console.log('===>request url: ', url);
 
@@ -207,9 +198,8 @@ router.post('/subscribe', async (req: Request, res: Response) => {
             url,
           }),
         );
-
-        // console.log('===>axios ret', ret);
       });
+
       const ret = await Promise.all(promises);
       console.log('===>Set hook ret: ', ret);
     }
