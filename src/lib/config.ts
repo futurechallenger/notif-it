@@ -35,12 +35,14 @@ interface OAuthConfig {
 }
 
 class Config {
+  //TODO: these config may be moved to other place
   host: string =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:8333'
       : process.env.PROJECT_DOMAIN;
 
   serviceHost: string = process.env.SERVICE_HOST;
+  serviceHookPath: string = process.env.SERVICE_HOOK_PATH;
   expiration?: string;
 
   getOAuth2URL(config: OAuthConfig): string {

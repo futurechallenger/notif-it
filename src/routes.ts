@@ -16,6 +16,8 @@ import { EventHook, parseEventsByRID } from './services/eventService';
 import { parseAction } from './services/trelloService';
 import { Request, Response } from './types';
 import { trelloHost } from './util/config';
+import { HookService } from './services/common';
+import { HookTrello } from './services/hookService';
 
 dotenv.config();
 
@@ -25,7 +27,6 @@ const host =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:8333'
     : process.env.PROJECT_DOMAIN;
-// const authUrl = `${trelloHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
 const config = new Config();
 // TODO: Need a place to setup app name
 const authUrl = config.getOAuth2URL({
@@ -44,7 +45,6 @@ router.get('/', (_: Request, res: Response) => {
 });
 
 router.get('/auth', async (_: Request, res: Response) => {
-  // TODO: get service and team Id maybe, service is a must
   // TODO: Generate auth url corresponding to the service
   res.redirect(authUrl);
 });
@@ -178,31 +178,8 @@ router.post('/subscribe', async (req: Request, res: Response) => {
     console.log('==>Parsed events', parsedEvents);
 
     // NOTE: if too many events are subscribed, there might be a rate limit problem.
-    let promises: Promise<any>[] = [];
-    if (parsedEvents && parsedEvents.length > 0) {
-      parsedEvents.forEach(({ eventId, hookId, action }: EventHook) => {
-        let url;
-        if (action === 'post') {
-          url = `${trelloHost}webhooks/?idModel=${eventId}&description="My Webhook"&callbackURL=${process.env.PROJECT_DOMAIN}/service/hook/${rid}&key=${process.env.TRELLO_KEY}&token=${token}`;
-        } else if (action === 'delete') {
-          url = `${trelloHost}webhooks/${hookId}?key=${process.env.TRELLO_KEY}&token=${token}`;
-        } else {
-          url = `${trelloHost}webhooks/${hookId}?description="My Webhook"&key=${process.env.TRELLO_KEY}&token=${token}`;
-        }
-
-        console.log('===>request url: ', url);
-
-        promises.push(
-          Axios({
-            method: action,
-            url,
-          }),
-        );
-      });
-
-      const ret = await Promise.all(promises);
-      console.log('===>Set hook ret: ', ret);
-    }
+    const service: HookService = new HookTrello();
+    await service.setHooksForEvents(parsedEvents, rid, token);
 
     res.json({ status: 'OK' });
   } catch (e) {
