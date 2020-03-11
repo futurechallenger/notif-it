@@ -9,16 +9,14 @@ import {
   getEventsHookByRID,
   getTokenByRID,
   storeEnvets,
-  storeTokenByID,
   storeEnvetsByRID,
+  storeTokenByID,
 } from './db';
+import { HookService } from './services/common';
 import { EventHook, parseEventsByRID } from './services/eventService';
 import { parseAction } from './services/trelloService';
-import { Request, Response } from './types';
+import { OAuthConfig, Request, Response } from './types';
 import { trelloHost } from './util/config';
-import { HookService } from './services/common';
-import { HookTrello } from './services/hookService';
-import { OAuthConfig } from './types';
 
 dotenv.config();
 
@@ -194,19 +192,6 @@ function configRouter(
     }
   });
 
-  if (process.env.NODE_ENV === 'development') {
-    router.get('/query', async (req: Request, res: Response) => {
-      const ret = await storeEnvets(req.query.teamId, req.query.events);
-      res.json(ret);
-    });
-
-    router.post('/query', async (req: Request, res: Response) => {
-      const { teamId, events } = req.body;
-      const ret = await storeEnvets(teamId, events);
-      res.json(ret);
-    });
-  }
-
   // Reponse the head request to satisfy some of the 3rd services
   router.head('/service/hook/:rid', async (req: Request, res: Response) => {
     const rid = req.params.rid;
@@ -244,7 +229,6 @@ function configRouter(
       res.status(200).json({ status: 'OK' });
     } catch (e) {
       console.error('ERROR: ', e);
-      // TODO: retry?
       res.status(200).json({ message: e.message });
     }
   });
