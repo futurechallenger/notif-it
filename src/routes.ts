@@ -36,7 +36,7 @@ const authUrl = config.getOAuth2URL({
   responseType: 'token',
   clientId: process.env.TRELLO_KEY, // TODO: according to service of current auth
   clientIDAlias: 'key',
-  name: process.env.APP_NAME || 'My App',
+  name: 'The Awesome Notification App',
   expiration: 'never',
 });
 
