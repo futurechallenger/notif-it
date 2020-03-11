@@ -10,15 +10,12 @@ export class HookTrello implements HookService {
     rid: number,
     token: string,
   ): Promise<any | null> {
-    if (!parsedEvents) {
+    if (!parsedEvents || parsedEvents.length <= 0) {
       return null;
     }
 
     try {
-      let promises: any[];
-      if (!parsedEvents || parsedEvents.length <= 0) {
-        return null;
-      }
+      let promises: any[] = [];
 
       parsedEvents.forEach(({ eventId, hookId, action }: EventHook) => {
         let url;
