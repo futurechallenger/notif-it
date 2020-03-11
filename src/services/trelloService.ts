@@ -5,7 +5,7 @@ import { get } from 'lodash';
  * @param payload returned from 3rd service
  * @param events model ID list formated likt xxx,xxx
  */
-function parseAction(payload: any, events?: string) {
+function parseEventContent(payload: any, events?: string) {
   // const getAtMentionText=() =>{
   //   return _.unescape(Remove_Markdown(this.get('activity').replace(/\n/g, ' ')));
   // },
@@ -421,4 +421,4 @@ function parseAction(payload: any, events?: string) {
   }
 }
 
-export { parseAction };
+export { parseEventContent as parseAction };

@@ -1,45 +1,16 @@
 import { snakeCase, each } from 'lodash';
 import * as QueryString from 'query-string';
-
-interface OAuthConfig {
-  [index: string]: string | string[] | boolean;
-  /**
-   * App name
-   */
-  name: string;
-  // teamId: string; // Team or conversation or channel ID
-  serviceURL: string;
-  /**
-   * service and authPath together compose a auth url
-   */
-  // authPath: string;
-  returnURL: string;
-  returnURLAlias?: string;
-  scopes: string[];
-  scopeDivider?: string;
-  /**
-   * Client Id or client key
-   */
-  clientId: string;
-  responseType?: string;
-  /**
-   * In case you client ID is not named as clientID, but key or something else.
-   */
-  clientIDAlias?: string;
-  state?: string;
-  // TODO: maybe a single obj to do the config
-  expiration?: string; // trello 1h, 1day, etc.
-  login?: string; // github
-  allowSignup?: boolean; // github
-}
+import { OAuthConfig } from '../types';
 
 class Config {
+  //TODO: these config may be moved to other place
   host: string =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:8333'
       : process.env.PROJECT_DOMAIN;
 
   serviceHost: string = process.env.SERVICE_HOST;
+  serviceHookPath: string = process.env.SERVICE_HOOK_PATH;
   expiration?: string;
 
   getOAuth2URL(config: OAuthConfig): string {
