@@ -108,9 +108,8 @@ async function storeToken(teamId: string, token: string): Promise<number> {
 }
 
 async function storeTokenByID(
-  teamId: string,
+  webhook: string,
   token: string,
-  service: string,
   id?: number,
 ): Promise<{ id: number } | null> {
   const client = await pool.connect();
@@ -120,14 +119,14 @@ async function storeTokenByID(
     if (!id) {
       // Insert
       opRet = await client.query(
-        'insert into team (teamId, tk, service, createdAt) values ($1, $2, $3, $4) returning id',
-        [teamId, token, service, +moment.utc().format('X')],
+        'insert into team (hook, tk , createdAt) values ($1, $2, $3, $4) returning id',
+        [webhook, token, +moment.utc().format('X')],
       );
-      return opRet.rowCount > 0 ? opRet.rows[0].id : null;
+      return opRet.rowCount > 0 ? opRet.rows[0] : null;
     } else {
       opRet = await client.query(
-        `update team set tk=$1, updatedAt=$2, teamId=$3 where id='${id}`,
-        [token, +moment.utc().format('X'), teamId],
+        `update team set tk=$1, updatedAt=$2  where id='${id}`,
+        [token, +moment.utc().format('X')],
       );
       return opRet.rowCount > 0 ? { id } : null;
     }

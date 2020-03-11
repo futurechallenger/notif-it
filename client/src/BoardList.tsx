@@ -89,13 +89,13 @@ const BoardList = () => {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const rid = localStorage.getItem(UNIQUE_ID_NAME);
-        if (!rid) {
+        const hook = localStorage.getItem(UNIQUE_ID_NAME);
+        if (!hook) {
           dispatch({ type: 'FETCH_DONE', boards: [] });
           return;
         }
 
-        const ret = await getBoardsList(rid);
+        const ret = await getBoardsList(hook);
         console.log('==>effect boards', ret);
 
         //TODO: deal with empty return or error return

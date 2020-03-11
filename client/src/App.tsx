@@ -4,20 +4,13 @@ import './App.css';
 import { AuthButton } from './AuthButton';
 import { getTeamStatus } from './services/status';
 import { SourcePage } from './SourcePage';
-import { UNIQUE_ID_NAME } from './util/config';
 
 const App = () => {
   const [status, setStatus] = useState('INIT');
   // TODO: team id and app type as a part of the url
   useEffect(() => {
     const fetchStatus = async () => {
-      const rtk = localStorage.getItem(UNIQUE_ID_NAME);
-      if (!rtk) {
-        setStatus('NOT_AUTHED');
-        return;
-      }
-
-      const ret = await getTeamStatus(rtk);
+      const ret = await getTeamStatus();
       if (!ret) {
         setStatus('NOT_AUTHED');
         return;

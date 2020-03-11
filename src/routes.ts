@@ -90,21 +90,20 @@ function configRouter(
 
   router.post('/callback', async (req: Request, res: Response) => {
     try {
-      const { t, teamId, apptype: service } = req.body;
-      const { rid = null, teamId: payloadTeamId = null } = req.decoded;
+      const { t, webhook } = req.body;
+      // const { t, teamId, apptype: service } = req.body;
+      const { rid = null } = req.decoded;
 
       console.log('===>/callback, REQ BODY', req.body);
-      console.log(
-        `===>/callback, TeamID ${teamId}, payload teamId ${payloadTeamId}`,
-      );
+      console.log(`===>/callback, webhook: ${webhook}, `);
 
-      const ret = await storeTokenByID(payloadTeamId, t, service, rid);
+      const ret = await storeTokenByID(webhook, t, rid);
       if (!ret) {
         throw new Error('DB error to keep tk');
       }
 
       // TODO: We dont have to sign every call of this api
-      const encodedKey = jwt.sign({ rid: ret, teamId }, process.env.JWT_SALT);
+      const encodedKey = jwt.sign({ rid: ret.id }, process.env.JWT_SALT);
       res.json({ status: 'OK', rtk: encodedKey });
     } catch (e) {
       console.error('ERROR: ', e);
