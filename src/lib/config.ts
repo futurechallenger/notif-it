@@ -3,7 +3,10 @@ import * as QueryString from 'query-string';
 
 interface OAuthConfig {
   [index: string]: string | string[] | boolean;
-
+  /**
+   * App name
+   */
+  name: string;
   // teamId: string; // Team or conversation or channel ID
   serviceURL: string;
   /**
@@ -26,10 +29,6 @@ interface OAuthConfig {
   state?: string;
   // TODO: maybe a single obj to do the config
   expiration?: string; // trello 1h, 1day, etc.
-  /**
-   * App name
-   */
-  name?: string;
   login?: string; // github
   allowSignup?: boolean; // github
 }
