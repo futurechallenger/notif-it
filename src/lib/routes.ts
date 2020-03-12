@@ -25,6 +25,8 @@ function configRouter(
   messageService: MessageService,
   authConfig: OAuthConfig,
 ): Express.Router {
+  console.log('AUTH CONFIG', authConfig);
+
   const router = Express.Router();
 
   const config = new Config();
