@@ -31,7 +31,7 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({
         // TODO: get team id, service from location.href
         const url = window.location.href;
         if (url.indexOf('?') <= 0) {
-          console.error('===>Can not get teamId and appType');
+          console.error('===>Can not get webhook');
           return;
         }
 

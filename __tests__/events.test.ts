@@ -1,9 +1,10 @@
-import { compareEvents } from '@services/eventService';
+import { TrelloEventService } from '@services/eventService';
 import { Config } from '@lib/config';
 
 describe('Test events parser', () => {
   it('compare current hooks of events and events', () => {
-    const ret = compareEvents(
+    const service = new TrelloEventService();
+    const ret = service._compareEvents(
       ['1', '3', '9'],
       [{ idModel: '1' }, { idModel: '2' }, { idModel: '8' }],
     );

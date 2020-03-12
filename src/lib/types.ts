@@ -56,6 +56,7 @@ interface Context {
   token: string;
   serviceURL: string;
   events?: any;
+  currentEvents?: any;
 }
 
 export {

@@ -4,6 +4,8 @@ import * as dotenv from 'dotenv';
 import * as Express from 'express';
 import * as jwt from 'jsonwebtoken';
 import { get } from 'lodash';
+import { EventHook } from '../services/eventService';
+import { EventService, HookService, MessageService } from './common';
 import {
   getEventsByRID,
   getEventsHookByRID,
@@ -11,10 +13,7 @@ import {
   storeEnvetsByRID,
   storeTokenByID,
 } from './db';
-import { EventHook, parseEventsByRID } from '../services/eventService';
-import { parseAction } from '../services/trelloService';
-import { EventService, HookService, MessageService } from './common';
-import { OAuthConfig, Request, Response, Context } from './types';
+import { Context, OAuthConfig, Request, Response } from './types';
 
 dotenv.config();
 
@@ -111,7 +110,6 @@ function configRouter(
     }
   });
 
-  // TODO: use cache to reduce db query
   router.get('/events', async (req: Request, res: Response) => {
     try {
       // const rid = req.params.rid;
@@ -164,7 +162,10 @@ function configRouter(
 
       //TODO: Set / update hook
       // 1. get parsed events
-      const parsedEvents: EventHook[] = await parseEventsByRID(rid, events);
+      // const parsedEvents: EventHook[] = await parseEventsByRID(rid, events);
+
+      context.currentEvents = events;
+      const parsedEvents: EventHook[] = await eventHandler.parseHooks(context);
       console.log('==>Parsed events', parsedEvents);
 
       // NOTE: if too many events are subscribed, there might be a rate limit problem.

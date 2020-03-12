@@ -14,7 +14,9 @@ interface MessageService {
 }
 
 interface EventService {
+  getCurrentHooks(context: Context): Promise<any | null>;
   getAllEvents(context: Context): Promise<any[] | null>;
+  parseHooks(context: Context): Promise<any | null>;
   setEventsInContext(events: any[], context: Context): void;
 }
 

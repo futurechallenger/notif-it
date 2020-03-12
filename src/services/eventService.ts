@@ -1,7 +1,5 @@
 import Axios from 'axios';
-import { trelloHost } from '@src/util/_config';
-import { getTeamToken, getTokenByRID } from '@src/lib/db';
-import { each, find, difference } from 'lodash';
+import { difference, each, find } from 'lodash';
 import { EventService } from '../lib/common';
 import { Context } from '../lib/types';
 
@@ -19,95 +17,55 @@ interface WebHookType {
   active?: boolean;
 }
 
-/**
- * Get events from remote server
- * @param token  token of the service
- */
-async function getEventHooksFromRemote(
-  token: string,
-): Promise<WebHookType[] | null> {
-  const ret = await Axios.get(
-    `${trelloHost}tokens/${token}/webhooks?key=${process.env.TRELLO_KEY}`,
-  );
-  if (ret.status !== 200) {
-    return null;
-  }
-
-  return ret.data;
-}
-
-async function parseEvents(
-  teamId: string,
-  dest: string[],
-): Promise<EventHook[] | null> {
-  try {
-    const tkRet = await getTeamToken(teamId);
-    if (!tkRet) {
-      return null;
-    }
-    const token = tkRet.tk;
-    const currentHooks = await getEventHooksFromRemote(token);
-
-    // No existing webhooks
-    if (!currentHooks || currentHooks.length === 0) {
-      return dest.map((eId: string) => ({ eventId: eId, action: 'post' }));
-    }
-
-    return compareEvents(dest, currentHooks);
-  } catch (e) {
-    console.error('==>parse events error: ', e);
-  }
-}
-
-async function parseEventsByRID(
-  rid: number,
-  dest: string[],
-): Promise<EventHook[] | null> {
-  try {
-    const tkRet = await getTokenByRID(rid);
-    if (!tkRet) {
-      return null;
-    }
-    const token = tkRet.tk;
-    const currentHooks = await getEventHooksFromRemote(token);
-
-    // No existing webhooks
-    if (!currentHooks || currentHooks.length === 0) {
-      return dest.map((eId: string) => ({ eventId: eId, action: 'post' }));
-    }
-
-    return compareEvents(dest, currentHooks);
-  } catch (e) {
-    console.error('==>parse events error: ', e);
-  }
-}
-
-function compareEvents(
-  dest: string[],
-  currentHooks: WebHookType[],
-): EventHook[] {
-  const result: EventHook[] = [];
-  const temp: string[] = [];
-  currentHooks.forEach((el: WebHookType) => {
-    if (!find(dest, (ev: string) => el.idModel === ev)) {
-      result.push({ eventId: el.idModel, hookId: el.id, action: 'delete' });
-    } else {
-      temp.push(el.idModel);
-      result.push({ eventId: el.idModel, hookId: el.id, action: 'put' });
-    }
-  });
-
-  if (temp.length < dest.length) {
-    const diffed = difference(dest, temp);
-    each(diffed, (eId: string) => {
-      result.push({ eventId: eId, action: 'post' });
-    });
-  }
-
-  return result;
-}
-
 class TrelloEventService implements EventService {
+  _compareEvents(dest: string[], currentHooks: WebHookType[]): EventHook[] {
+    const result: EventHook[] = [];
+    const temp: string[] = [];
+    currentHooks.forEach((el: WebHookType) => {
+      if (!find(dest, (ev: string) => el.idModel === ev)) {
+        result.push({ eventId: el.idModel, hookId: el.id, action: 'delete' });
+      } else {
+        temp.push(el.idModel);
+        result.push({ eventId: el.idModel, hookId: el.id, action: 'put' });
+      }
+    });
+
+    if (temp.length < dest.length) {
+      const diffed = difference(dest, temp);
+      each(diffed, (eId: string) => {
+        result.push({ eventId: eId, action: 'post' });
+      });
+    }
+
+    return result;
+  }
+
+  async parseHooks(context: Context): Promise<any | null> {
+    const { currentEvents: dest = [] } = context;
+    const currentHooks = await this.getCurrentHooks(context);
+
+    // No existing webhooks
+    if (!currentHooks || currentHooks.length === 0) {
+      return dest.map((eId: string) => ({ eventId: eId, action: 'post' }));
+    }
+
+    return this._compareEvents(dest, currentHooks);
+  }
+
+  async getCurrentHooks(context: Context): Promise<any[] | null> {
+    const { token, serviceURL } = context;
+
+    const ret = await Axios.get(
+      `${serviceURL}/1/tokens/${token}/webhooks?key=${process.env.TRELLO_KEY}`,
+    );
+
+    if (ret.status !== 200) {
+      return null;
+    }
+
+    return ret.data;
+  }
+
   async getAllEvents(context: Context): Promise<any | null> {
     const { token, serviceURL } = context;
 
@@ -137,11 +95,4 @@ class TrelloEventService implements EventService {
   }
 }
 
-export {
-  EventHook,
-  WebHookType,
-  parseEvents,
-  compareEvents,
-  parseEventsByRID,
-  TrelloEventService,
-};
+export { EventHook, WebHookType, TrelloEventService };
