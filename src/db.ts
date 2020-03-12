@@ -119,7 +119,7 @@ async function storeTokenByID(
     if (!id) {
       // Insert
       opRet = await client.query(
-        'insert into team (hook, tk , createdAt) values ($1, $2, $3, $4) returning id',
+        'insert into team (hook, tk , createdAt) values ($1, $2, $3) returning id',
         [webhook, token, +moment.utc().format('X')],
       );
       return opRet.rowCount > 0 ? opRet.rows[0] : null;
