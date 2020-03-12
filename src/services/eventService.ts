@@ -1,7 +1,9 @@
 import Axios from 'axios';
-import { trelloHost } from '@util/config';
-import { getTeamToken, getTokenByRID } from '@src/db';
+import { trelloHost } from '@src/util/_config';
+import { getTeamToken, getTokenByRID } from '@src/lib/db';
 import { each, find, difference } from 'lodash';
+import { EventService } from '../lib/common';
+import { Context } from '../lib/types';
 
 interface EventHook {
   eventId: string;
@@ -105,4 +107,41 @@ function compareEvents(
   return result;
 }
 
-export { EventHook, WebHookType, parseEvents, compareEvents, parseEventsByRID };
+class TrelloEventService implements EventService {
+  async getAllEvents(context: Context): Promise<any | null> {
+    const { token, serviceURL } = context;
+
+    const userInfoURI = `${serviceURL}/1/members/me?key=${process.env.TRELLO_KEY}&token=${token}`;
+    let userInfo = await Axios.get(userInfoURI);
+    if (userInfo.status !== 200) {
+      throw new Error('Get userinfo error');
+    }
+
+    // Get boards from 3rd service
+    const boardsURI = `${serviceURL}/1/members/${userInfo.data.username}/boards?key=${process.env.TRELLO_KEY}&token=${token}&filter=open&fields=id,name,desc`;
+    const { status, data } = await Axios.get(boardsURI);
+
+    console.log('==>Event handler ret: ', data);
+
+    if (status !== 200) {
+      throw new Error('Get boards error');
+    }
+
+    this.setEventsInContext(data, context);
+
+    return data;
+  }
+
+  setEventsInContext(events: any, context: Context) {
+    context.events = events;
+  }
+}
+
+export {
+  EventHook,
+  WebHookType,
+  parseEvents,
+  compareEvents,
+  parseEventsByRID,
+  TrelloEventService,
+};

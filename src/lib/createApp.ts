@@ -1,6 +1,5 @@
 import * as bodyParser from 'body-parser';
 import * as compression from 'compression';
-// import * as serve from 'koa-static';
 import * as cors from 'cors';
 import * as dotenv from 'dotenv';
 import * as ejs from 'ejs';
@@ -8,21 +7,25 @@ import * as Express from 'express';
 import * as jwt from 'jsonwebtoken';
 import 'module-alias/register';
 import * as path from 'path';
-import { configRouter } from '../routes';
-import { HookService } from '../services/common';
-import { HookTrello } from '../services/hookService';
+import { configRouter } from './routes';
+import { HookService, EventService, MessageService } from './common';
 import {
   DecodedType,
   NextFunction,
   Request,
   Response,
   OAuthConfig,
-} from '../types';
+} from './types';
 
 // load dotenv
 dotenv.config();
 
-function createApp(authConfig: OAuthConfig) {
+function createApp(
+  authConfig: OAuthConfig,
+  serviceHook: HookService,
+  eventHandler: EventService,
+  messageService: MessageService,
+) {
   // APP
   const app = Express();
 
@@ -65,15 +68,15 @@ function createApp(authConfig: OAuthConfig) {
   });
 
   // routes
-  const serviceHook: HookService = new HookTrello();
-  const router = configRouter(serviceHook, authConfig);
+
+  const router = configRouter(
+    serviceHook,
+    eventHandler,
+    messageService,
+    authConfig,
+  );
   app.use(router);
 
-  // const port = process.env.PORT || 8333;
-
-  // app.listen(port, () => {
-  //   console.log(`App is serving on port ${port}`);
-  // });
   return app;
 }
 

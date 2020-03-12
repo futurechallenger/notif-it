@@ -1,4 +1,6 @@
 import { get } from 'lodash';
+import { MessageService } from '@src/lib/common';
+import { Context } from '../lib/types';
 
 /**
  * Event filter is now based on board, not actions in a board
@@ -6,10 +8,6 @@ import { get } from 'lodash';
  * @param events model ID list formated likt xxx,xxx
  */
 function parseEventContent(payload: any, events?: string) {
-  // const getAtMentionText=() =>{
-  //   return _.unescape(Remove_Markdown(this.get('activity').replace(/\n/g, ' ')));
-  // },
-
   // TODO: What to post to return when there's no events source subscribed
   if (!events) {
     return;
@@ -29,20 +27,6 @@ function parseEventContent(payload: any, events?: string) {
     const eventName = get(this.payload, 'model.id', null);
     return this.events.indexOf(eventName) >= 0;
   };
-
-  /**
-   * Send translated message
-   * @param data Send
-   */
-  // const deliverPayload = (data: any) => {
-  // TODO: send data
-  // TODO: check format against the doc
-  // const ret = Axios.post('', {
-  //   ...data,
-  //   payload: { action: payload.action },
-  // });
-  // return ret;
-  // };
 
   const createList = () => {
     if (!canPost('list_created')) {
@@ -421,4 +405,11 @@ function parseEventContent(payload: any, events?: string) {
   }
 }
 
-export { parseEventContent as parseAction };
+class TrelloMessageService implements MessageService {
+  parseEvent(payload: any, context: Context): any | null {
+    const { events = '' } = context;
+    const ret = parseEventContent(payload, events as string);
+  }
+}
+
+export { parseEventContent as parseAction, TrelloMessageService };

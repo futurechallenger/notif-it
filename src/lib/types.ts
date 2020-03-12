@@ -30,7 +30,7 @@ interface OAuthConfig {
   /**
    * service and authPath together compose a auth url
    */
-  // authPath: string;
+  authPath: string;
   returnURL: string;
   returnURLAlias?: string;
   scopes: string[];
@@ -51,6 +51,13 @@ interface OAuthConfig {
   allowSignup?: boolean; // github
 }
 
+interface Context {
+  rid: string;
+  token: string;
+  serviceURL: string;
+  events?: any;
+}
+
 export {
   Request,
   Response,
@@ -59,4 +66,5 @@ export {
   DecodedType,
   Router,
   OAuthConfig,
+  Context,
 };

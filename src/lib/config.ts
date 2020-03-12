@@ -1,6 +1,6 @@
 import { snakeCase, each } from 'lodash';
 import * as QueryString from 'query-string';
-import { OAuthConfig } from '../types';
+import { OAuthConfig } from './types';
 
 class Config {
   //TODO: these config may be moved to other place
@@ -30,8 +30,7 @@ class Config {
       config[alias] = returnUrlValue;
     }
 
-    // const url = `${this.serviceHost}authorize?expiration=${expiration}&name=${appName}&scope=${scope}&response_type=token&key=${process.env.TRELLO_KEY}&return_url=${host}/callback`;
-    let url = `${config.serviceURL}?`;
+    let url = `${config.serviceURL}${config.authPath}`;
     delete config.serviceURL, delete config.authPath;
 
     const scope = config.scopes.join(config.scopeDivider || ',');
@@ -44,7 +43,7 @@ class Config {
       target[parsedKey] = config[k];
     });
 
-    url = `${url}${QueryString.stringify(target, {
+    url = `${url}?${QueryString.stringify(target, {
       skipNull: true,
       encode: false,
       sort: false,

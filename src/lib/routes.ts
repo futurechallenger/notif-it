@@ -8,41 +8,28 @@ import {
   getEventsByRID,
   getEventsHookByRID,
   getTokenByRID,
-  storeEnvets,
   storeEnvetsByRID,
   storeTokenByID,
 } from './db';
-import { HookService } from './services/common';
-import { EventHook, parseEventsByRID } from './services/eventService';
-import { parseAction } from './services/trelloService';
-import { OAuthConfig, Request, Response } from './types';
-import { trelloHost } from './util/config';
+import { EventHook, parseEventsByRID } from '../services/eventService';
+import { parseAction } from '../services/trelloService';
+import { EventService, HookService, MessageService } from './common';
+import { OAuthConfig, Request, Response, Context } from './types';
 
 dotenv.config();
 
 function configRouter(
   hookService: HookService,
+  eventHandler: EventService,
+  messageService: MessageService,
   authConfig: OAuthConfig,
 ): Express.Router {
   const router = Express.Router();
 
-  // const host =
-  //   process.env.NODE_ENV === 'development'
-  //     ? 'http://localhost:8333'
-  //     : process.env.PROJECT_DOMAIN;
   const config = new Config();
-  // TODO: Need a place to setup app name
-  // const authUrl = config.getOAuth2URL({
-  //   serviceURL: process.env.TRELLO_HOST, // TODO: use the auth host by configured service and get the host from env var
-  //   scopes: ['read'],
-  //   returnURL: `${host}/callback`,
-  //   responseType: 'token',
-  //   clientId: process.env.TRELLO_KEY, // TODO: according to service of current auth
-  //   clientIDAlias: 'key',
-  //   name: 'The Awesome Notification App',
-  //   expiration: 'never',
-  // });
   const authUrl = config.getOAuth2URL(authConfig);
+
+  let context: Context;
 
   router.get('/', (_: Request, res: Response) => {
     res.render('index');
@@ -65,6 +52,13 @@ function configRouter(
       if (!ret) {
         throw new Error('No token found');
       }
+
+      context = {
+        rid: `${rid}`,
+        token: ret.tk,
+        serviceURL: authConfig.serviceURL,
+      };
+
       res.json({ status: 'OK' });
     } catch (e) {
       const message = e.message;
@@ -102,6 +96,12 @@ function configRouter(
         throw new Error('DB error to keep tk');
       }
 
+      context = {
+        rid: `${rid}`,
+        token: t,
+        serviceURL: authConfig.serviceURL,
+      };
+
       // TODO: We dont have to sign every call of this api
       const encodedKey = jwt.sign({ rid: ret.id }, process.env.JWT_SALT);
       res.json({ status: 'OK', rtk: encodedKey });
@@ -124,27 +124,14 @@ function configRouter(
         throw new Error('Cannot get token for team');
       }
 
-      // Get user info
-      const userInfoURI = `${trelloHost}members/me?key=${process.env.TRELLO_KEY}&token=${token}`;
-      let userInfo = await Axios.get(userInfoURI);
-      if (userInfo.status !== 200) {
-        throw new Error('Get userinfo error');
-      }
-
-      // Get boards from 3rd service
-      const boardsURI = `${trelloHost}/members/${userInfo.data.username}/boards?key=${process.env.TRELLO_KEY}&token=${token}&filter=open&fields=id,name,desc`;
-      const boardsInfo = await Axios.get(boardsURI);
-      if (boardsInfo.status !== 200) {
-        throw new Error('Get boards error');
-      }
+      const boards = await eventHandler.getAllEvents(context);
 
       // Get selected from DB
       const selRet = await getEventsByRID(+rid);
       console.log('===>Selected events', selRet);
 
-      // TODO: get selected boards for updating
       res.json({
-        boards: boardsInfo.data,
+        boards,
         selected: (selRet.events && selRet.events.split(',')) || '',
       });
     } catch (e) {
@@ -182,7 +169,7 @@ function configRouter(
 
       // NOTE: if too many events are subscribed, there might be a rate limit problem.
       // const service: HookService = new HookTrello();
-      await hookService.setHooksForEvents(parsedEvents, rid, token);
+      await hookService.setHooksForEvents(parsedEvents, context);
 
       res.json({ status: 'OK' });
     } catch (e) {
@@ -198,10 +185,6 @@ function configRouter(
     res.status(200).json({ message: 'OK' });
   });
 
-  // TODO: /{process.env.SERVICE_NAME}/hook/{teamId}. Use this
-  // path to handle hooks from 3rd party services
-  // TODO: Need a queue to deal with this.
-  // Message translation
   router.post('/service/hook/:rid', async (req: Request, res: Response) => {
     const { service, rid } = req.params;
     console.log(
@@ -219,7 +202,7 @@ function configRouter(
 
     try {
       const eventsRet = req.body;
-      const hookNormalized = parseAction(eventsRet, events);
+      const hookNormalized = messageService.parseEvent(eventsRet, context);
 
       const ret = await Axios.post(messageHook, hookNormalized);
 
