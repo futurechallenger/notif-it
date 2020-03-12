@@ -17,7 +17,7 @@ import { Context, OAuthConfig, Request, Response } from './types';
 
 dotenv.config();
 
-let context: Context;
+let context: Context = {};
 
 function configRouter(
   hookService: HookService,
