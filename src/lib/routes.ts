@@ -28,12 +28,10 @@ function configRouter(
   console.log('AUTH CONFIG', authConfig);
 
   const router = Express.Router();
-
-  const config = new Config();
-  const authUrl = config.getOAuth2URL(authConfig);
-
   context.serviceURL = authConfig.serviceURL;
   context.service = authConfig.service;
+  const config = new Config();
+  const authUrl = config.getOAuth2URL(authConfig);
 
   router.get('/', (_: Request, res: Response) => {
     res.render('index');
@@ -108,11 +106,11 @@ function configRouter(
       const { rid } = req.decoded;
       console.log('===>events id:', rid);
 
-      const tokenRet = await getTokenByRID(+rid);
-      const token = get(tokenRet, 'tk', null);
-      if (!token) {
-        throw new Error('Cannot get token for team');
-      }
+      // const tokenRet = await getTokenByRID(+rid);
+      // const token = get(tokenRet, 'tk', null);
+      // if (!token) {
+      //   throw new Error('Cannot get token for team');
+      // }
 
       const boards = await eventHandler.getAllEvents({ rid, ...context });
 
