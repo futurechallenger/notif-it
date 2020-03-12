@@ -17,6 +17,8 @@ import { Context, OAuthConfig, Request, Response } from './types';
 
 dotenv.config();
 
+let context: Context;
+
 function configRouter(
   hookService: HookService,
   eventHandler: EventService,
@@ -27,8 +29,6 @@ function configRouter(
 
   const config = new Config();
   const authUrl = config.getOAuth2URL(authConfig);
-
-  let context: Context;
 
   router.get('/', (_: Request, res: Response) => {
     res.render('index');
@@ -122,6 +122,7 @@ function configRouter(
         throw new Error('Cannot get token for team');
       }
 
+      console.log('===>Events context: ', context);
       const boards = await eventHandler.getAllEvents(context);
 
       // Get selected from DB
@@ -161,6 +162,7 @@ function configRouter(
       }
 
       context.currentEvents = events;
+      console.log('===>Context ', context);
       const parsedEvents: EventHook[] = await eventHandler.parseHooks(context);
       console.log('==>Parsed events', parsedEvents);
 
@@ -197,6 +199,7 @@ function configRouter(
 
     try {
       const eventsRet = req.body;
+      console.log('===>Hook context: ', context);
       const hookNormalized = messageService.parseEvent(eventsRet, context);
 
       const ret = await Axios.post(messageHook, hookNormalized);
