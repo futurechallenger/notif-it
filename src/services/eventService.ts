@@ -94,7 +94,7 @@ class TrelloEventService implements EventService {
     return data;
   }
 
-  private _getServiceName(service: any) {
+  private _getServiceName(service: string) {
     return `${service.toUpperCase()}_KEY`;
   }
 
