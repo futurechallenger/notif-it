@@ -22,7 +22,7 @@ import {
 // load dotenv
 dotenv.config();
 
-function createApp(authConfig: OAuthConfig) {
+function createApp(authConfig: OAuthConfig, serviceHook: HookService) {
   // APP
   const app = Express();
 
@@ -65,15 +65,10 @@ function createApp(authConfig: OAuthConfig) {
   });
 
   // routes
-  const serviceHook: HookService = new HookTrello();
+
   const router = configRouter(serviceHook, authConfig);
   app.use(router);
 
-  // const port = process.env.PORT || 8333;
-
-  // app.listen(port, () => {
-  //   console.log(`App is serving on port ${port}`);
-  // });
   return app;
 }
 

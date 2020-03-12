@@ -26,22 +26,7 @@ function configRouter(
 ): Express.Router {
   const router = Express.Router();
 
-  // const host =
-  //   process.env.NODE_ENV === 'development'
-  //     ? 'http://localhost:8333'
-  //     : process.env.PROJECT_DOMAIN;
   const config = new Config();
-  // TODO: Need a place to setup app name
-  // const authUrl = config.getOAuth2URL({
-  //   serviceURL: process.env.TRELLO_HOST, // TODO: use the auth host by configured service and get the host from env var
-  //   scopes: ['read'],
-  //   returnURL: `${host}/callback`,
-  //   responseType: 'token',
-  //   clientId: process.env.TRELLO_KEY, // TODO: according to service of current auth
-  //   clientIDAlias: 'key',
-  //   name: 'The Awesome Notification App',
-  //   expiration: 'never',
-  // });
   const authUrl = config.getOAuth2URL(authConfig);
 
   router.get('/', (_: Request, res: Response) => {
@@ -198,10 +183,6 @@ function configRouter(
     res.status(200).json({ message: 'OK' });
   });
 
-  // TODO: /{process.env.SERVICE_NAME}/hook/{teamId}. Use this
-  // path to handle hooks from 3rd party services
-  // TODO: Need a queue to deal with this.
-  // Message translation
   router.post('/service/hook/:rid', async (req: Request, res: Response) => {
     const { service, rid } = req.params;
     console.log(
