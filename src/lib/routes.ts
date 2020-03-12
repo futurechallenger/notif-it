@@ -30,6 +30,9 @@ function configRouter(
   const config = new Config();
   const authUrl = config.getOAuth2URL(authConfig);
 
+  context.serviceURL = authConfig.serviceURL;
+  context.service = authConfig.service;
+
   router.get('/', (_: Request, res: Response) => {
     res.render('index');
   });
@@ -51,12 +54,6 @@ function configRouter(
       if (!ret) {
         throw new Error('No token found');
       }
-
-      context = {
-        rid: `${rid}`,
-        token: ret.tk,
-        serviceURL: authConfig.serviceURL,
-      };
 
       res.json({ status: 'OK' });
     } catch (e) {
@@ -95,13 +92,6 @@ function configRouter(
         throw new Error('DB error to keep tk');
       }
 
-      context = {
-        rid: `${rid}`,
-        token: t,
-        serviceURL: authConfig.serviceURL,
-      };
-
-      // TODO: We dont have to sign every call of this api
       const encodedKey = jwt.sign({ rid: ret.id }, process.env.JWT_SALT);
       res.json({ status: 'OK', rtk: encodedKey });
     } catch (e) {
@@ -122,8 +112,7 @@ function configRouter(
         throw new Error('Cannot get token for team');
       }
 
-      console.log('===>Events context: ', context);
-      const boards = await eventHandler.getAllEvents(context);
+      const boards = await eventHandler.getAllEvents({ rid, ...context });
 
       // Get selected from DB
       const selRet = await getEventsByRID(+rid);
@@ -161,9 +150,12 @@ function configRouter(
         throw new Error('Cannot get token for team');
       }
 
-      context.currentEvents = events;
       console.log('===>Context ', context);
-      const parsedEvents: EventHook[] = await eventHandler.parseHooks(context);
+      const parsedEvents: EventHook[] = await eventHandler.parseHooks({
+        rid,
+        currentEvents: events,
+        ...context,
+      });
       console.log('==>Parsed events', parsedEvents);
 
       await hookService.setHooksForEvents(parsedEvents, context);
@@ -183,11 +175,9 @@ function configRouter(
   });
 
   router.post('/service/hook/:rid', async (req: Request, res: Response) => {
-    const { service, rid } = req.params;
-    console.log(
-      `===>HOOK BODY of service: ${service} team: ${rid}`,
-      JSON.stringify(req.body),
-    );
+    const { rid } = req.params;
+
+    console.log(`===>HOOK BODY of rid: ${rid}`, JSON.stringify(req.body));
 
     // Find hook to send data to
     const hookRet = await getEventsHookByRID(+rid);
@@ -200,7 +190,7 @@ function configRouter(
     try {
       const eventsRet = req.body;
       console.log('===>Hook context: ', context);
-      const hookNormalized = messageService.parseEvent(eventsRet, context);
+      const hookNormalized = messageService.parseEvent(eventsRet, { events });
 
       const ret = await Axios.post(messageHook, hookNormalized);
 

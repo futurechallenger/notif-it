@@ -22,6 +22,10 @@ interface RequestToken {
 interface OAuthConfig {
   [index: string]: string | string[] | boolean;
   /**
+   * Name of supported service
+   */
+  service: string;
+  /**
    * App name
    */
   name: string;
@@ -52,11 +56,12 @@ interface OAuthConfig {
 }
 
 interface Context {
-  rid: string;
-  token: string;
-  serviceURL: string;
-  events?: any;
-  currentEvents?: any;
+  [index: string]: any;
+  // rid: string;
+  // token: string;
+  // serviceURL: string;
+  // events?: any;
+  // currentEvents?: any;
 }
 
 export {
