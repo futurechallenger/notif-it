@@ -17,6 +17,7 @@ const eventHandler: EventService = new TrelloEventService();
 const messageService: MessageService = new TrelloMessageService();
 const app = createApp(
   {
+    service: 'trello',
     serviceURL: 'https://api.trello.com',
     authPath: '/1/authorize',
     scopes: ['read'],

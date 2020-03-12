@@ -6,6 +6,7 @@ describe('Test url generating from config', () => {
     const config = new Config();
     const returnURL = 'http://localhsot:8333/callback/1';
     const url = config.getOAuth2URL({
+      service: 'trello',
       serviceURL: 'https://api.trello.com',
       authPath: '/1/authorize',
       scopes: ['read'],
