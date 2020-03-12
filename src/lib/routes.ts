@@ -160,16 +160,10 @@ function configRouter(
         throw new Error('Cannot get token for team');
       }
 
-      //TODO: Set / update hook
-      // 1. get parsed events
-      // const parsedEvents: EventHook[] = await parseEventsByRID(rid, events);
-
       context.currentEvents = events;
       const parsedEvents: EventHook[] = await eventHandler.parseHooks(context);
       console.log('==>Parsed events', parsedEvents);
 
-      // NOTE: if too many events are subscribed, there might be a rate limit problem.
-      // const service: HookService = new HookTrello();
       await hookService.setHooksForEvents(parsedEvents, context);
 
       res.json({ status: 'OK' });
