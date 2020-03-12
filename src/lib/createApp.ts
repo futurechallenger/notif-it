@@ -27,7 +27,7 @@ function createApp(authConfig: OAuthConfig) {
   const app = Express();
 
   // View engine
-  const clientPath = '../views';
+  const clientPath = '../../views';
   app.engine('html', ejs.renderFile);
   app.set('view engine', 'html');
   app.set('views', path.join(__dirname, clientPath));
