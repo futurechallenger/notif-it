@@ -10,14 +10,9 @@ const App = () => {
   const [status, setStatus] = useState('INIT');
   const rtk = localStorage.getItem(UNIQUE_ID_NAME);
 
-  if (!rtk) {
-    setStatus('NOT_AUTHED');
-    return;
-  }
-
   useEffect(() => {
     const fetchStatus = async () => {
-      const ret = await getTeamStatus(rtk);
+      const ret = await getTeamStatus(rtk || '');
       if (!ret) {
         setStatus('NOT_AUTHED');
         return;
