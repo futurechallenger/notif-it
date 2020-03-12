@@ -1,8 +1,10 @@
 import * as dotenv from 'dotenv';
 import 'module-alias/register';
 import { createApp } from './lib/createApp';
-import { HookService } from './services/common';
+import { HookService, EventService, MessageService } from './lib/common';
 import { HookTrello } from './services/hookService';
+import { TrelloEventService } from './services/eventService';
+import { TrelloMessageService } from './services/trelloService';
 
 // load dotenv
 dotenv.config();
@@ -11,9 +13,12 @@ const host =
     ? 'http://localhost:8333'
     : process.env.PROJECT_DOMAIN;
 const serviceHook: HookService = new HookTrello();
+const eventHandler: EventService = new TrelloEventService();
+const messageService: MessageService = new TrelloMessageService();
 const app = createApp(
   {
-    serviceURL: process.env.TRELLO_HOST, // TODO: use the auth host by configured service and get the host from env var
+    serviceURL: 'https://api.trello.com',
+    authPath: '/1/authorize',
     scopes: ['read'],
     returnURL: `${host}/callback`,
     responseType: 'token',
@@ -23,6 +28,8 @@ const app = createApp(
     expiration: 'never',
   },
   serviceHook,
+  eventHandler,
+  messageService,
 );
 
 const port = process.env.PORT || 8333;
