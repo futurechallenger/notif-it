@@ -37,7 +37,11 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({
 
         const queryString = url.split('?')[1].replace(/#\/\w*/g, '');
         const parsed = qs.parse(queryString);
-        const parsedHash = qs.parse(param);
+        let hashParam = '';
+        if (param.indexOf('#') === 0) {
+          hashParam = param.substring(1);
+        }
+        const parsedHash = qs.parse(hashParam);
 
         const ret = await Axios.post(`${host}/auth/token`, {
           ...parsed,
