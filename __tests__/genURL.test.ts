@@ -8,6 +8,7 @@ describe('Test url generating from config', () => {
     const url = config.getOAuth2URL({
       service: 'trello',
       authType: 'implicit',
+      hostURL: 'http://localhsot:8333',
       serviceURL: 'https://api.trello.com',
       authURL: 'https://api.trello.com/1/authorize',
       scopes: ['read'],

@@ -36,6 +36,7 @@ interface OAuthConfig {
   tokenURL?: string;
   returnURL: string;
   returnURLAlias?: string;
+  hostURL: string;
   scopes: string[];
   scopeDivider?: string;
   /**

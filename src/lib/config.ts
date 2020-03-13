@@ -20,6 +20,12 @@ class Config {
     if ('authType' in config) {
       delete config.authType;
     }
+    if ('hostURL' in config) {
+      delete config.hostURL;
+    }
+    if ('tokenURL' in config) {
+      delete config.tokenURL;
+    }
 
     // TODO: valid the config
     if ('clientIDAlias' in config) {

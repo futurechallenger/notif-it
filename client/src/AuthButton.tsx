@@ -37,10 +37,11 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({
 
         const queryString = url.split('?')[1].replace(/#\/\w*/g, '');
         const parsed = qs.parse(queryString);
+        const parsedHash = qs.parse(param);
 
-        const ret = await Axios.post(`${host}/callback`, {
-          t: param,
+        const ret = await Axios.post(`${host}/auth/token`, {
           ...parsed,
+          ...parsedHash,
         });
         console.log('token', ret);
         if (!ret || ret.status !== 200) {
@@ -61,6 +62,8 @@ const AuthButton: React.FunctionComponent<AuthButtonProps> = ({
   }
 
   const onClick = () => {
+    // const params = new URL(window.location.href).searchParams;
+    // window.open(`${authUrl}?webhook=${params.get('webhook')}`);
     window.open(authUrl);
   };
 

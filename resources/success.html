@@ -46,7 +46,8 @@
 
         if (window.opener.callback) {
           var hash = window.location.hash;
-          window.opener.callback(hash.split('=')[1]);
+          // window.opener.callback(hash.split('=')[1]);
+          window.opener.callback(hash);
         }
       }
 
