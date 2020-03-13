@@ -43,6 +43,7 @@ function configRouter(
 
   router.get('/auth', async (_: Request, res: Response) => {
     // TODO: Generate auth url corresponding to the service
+    console.log('==>auth get url: ', authUrl);
     res.redirect(authUrl);
   });
 
@@ -141,12 +142,6 @@ function configRouter(
       // const rid = req.params.rid;
       const { rid } = req.decoded;
       console.log('===>events id:', rid);
-
-      // const tokenRet = await getTokenByRID(+rid);
-      // const token = get(tokenRet, 'tk', null);
-      // if (!token) {
-      //   throw new Error('Cannot get token for team');
-      // }
 
       const boards = await eventHandler.getAllEvents({ rid, ...context });
 
