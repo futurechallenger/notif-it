@@ -124,10 +124,18 @@ async function storeTokenByID(
       );
       return opRet.rowCount > 0 ? opRet.rows[0] : null;
     } else {
-      opRet = await client.query(
-        `update team set tk=$1, updatedAt=$2  where id='${id}`,
-        [token, +moment.utc().format('X')],
-      );
+      if (!token) {
+        opRet = await client.query(
+          `update team set webhook=$1, updatedAt=$2  where id='${id}`,
+          [webhook, +moment.utc().format('X')],
+        );
+      } else {
+        opRet = await client.query(
+          `update team set tk=$1, updatedAt=$2  where id='${id}`,
+          [token, +moment.utc().format('X')],
+        );
+      }
+
       return opRet.rowCount > 0 ? { id } : null;
     }
   } catch (e) {

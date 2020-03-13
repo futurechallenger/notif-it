@@ -3,6 +3,7 @@ import Axios from 'axios';
 import * as dotenv from 'dotenv';
 import * as Express from 'express';
 import * as jwt from 'jsonwebtoken';
+import * as qs from 'query-string';
 import { get } from 'lodash';
 import { EventHook } from '../services/eventService';
 import { EventService, HookService, MessageService } from './common';
@@ -28,6 +29,9 @@ function configRouter(
   console.log('AUTH CONFIG', authConfig);
 
   const router = Express.Router();
+  context.host = authConfig.hostURL;
+  context.authType = authConfig.authType;
+  context.tokenURL = authConfig.tokenURL;
   context.serviceURL = authConfig.serviceURL;
   context.service = authConfig.service;
   const config = new Config();
@@ -75,19 +79,51 @@ function configRouter(
   // Auth callback url
   router.get('/callback', async (req: Request, res: Response) => {
     console.log('==>Callback', req.query);
+    // Deal with oauth2.0: code => token
+    try {
+      if (context.authType === 'oauth2.0') {
+        // TODO: state
+        const { code } = req.query;
+        const ret = await Axios.post(context.tokenURL, {
+          client_id: process.env[`${context.service.toUpperCase()}_KEY`],
+          client_secret: process.env[`${context.service.toUpperCase()}_SECRET`],
+          code,
+          redirect_uri: `${context.host}/callback`,
+        });
+        console.log('get token', ret);
+        if (ret.status === 200) {
+          const { access_token: token } = qs.parse(ret.data);
+          const tk = Array.isArray(token) ? token[0] : token;
+          const qRet = await storeTokenByID('', tk);
+          const encodedKey = jwt.sign({ rid: qRet.id }, process.env.JWT_SALT);
+
+          res.redirect(`/success.html#rtk=${encodedKey}`);
+          return;
+        }
+      }
+
+      res.redirect(`/success.html`);
+    } catch (e) {
+      console.error('===>callback error:', e);
+      res.redirect('/failed.html');
+    }
+  });
+
+  router.post('/callback', (req: Request, res: Response) => {
+    console.log(req.body);
+    // res.json({ status: 'OK' });
     res.redirect('/success.html');
   });
 
-  router.post('/callback', async (req: Request, res: Response) => {
+  router.post('/auth/token', async (req: Request, res: Response) => {
     try {
-      const { t, webhook } = req.body;
-      // const { t, teamId, apptype: service } = req.body;
+      const { token, webhook } = req.body;
       const { rid = null } = req.decoded;
 
       console.log('===>/callback, REQ BODY', req.body);
       console.log(`===>/callback, webhook: ${webhook}, `);
 
-      const ret = await storeTokenByID(webhook, t, rid);
+      const ret = await storeTokenByID(webhook, token, rid);
       if (!ret) {
         throw new Error('DB error to keep tk');
       }

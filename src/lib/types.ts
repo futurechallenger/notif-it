@@ -25,18 +25,18 @@ interface OAuthConfig {
    * Name of supported service
    */
   service: string;
+  authType: string;
   /**
    * App name
    */
   name: string;
   // teamId: string; // Team or conversation or channel ID
   serviceURL: string;
-  /**
-   * service and authPath together compose a auth url
-   */
-  authPath: string;
+  authURL: string;
+  tokenURL?: string;
   returnURL: string;
   returnURLAlias?: string;
+  hostURL: string;
   scopes: string[];
   scopeDivider?: string;
   /**
@@ -52,7 +52,7 @@ interface OAuthConfig {
   // TODO: maybe a single obj to do the config
   expiration?: string; // trello 1h, 1day, etc.
   login?: string; // github
-  allowSignup?: boolean; // github
+  allowSignup?: string; // github
 }
 
 interface Context {

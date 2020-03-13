@@ -412,4 +412,15 @@ class TrelloMessageService implements MessageService {
   }
 }
 
-export { parseEventContent as parseAction, TrelloMessageService };
+class GithubMessageService implements MessageService {
+  parseEvent(payload: any, context: Context): any | null {
+    console.log('==>message ', payload, context);
+    return;
+  }
+}
+
+export {
+  parseEventContent as parseAction,
+  TrelloMessageService,
+  GithubMessageService,
+};
