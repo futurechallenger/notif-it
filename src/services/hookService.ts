@@ -4,7 +4,7 @@ import { HookService } from '../lib/common';
 import { Context } from '../lib/types';
 import { EventHook } from './eventService';
 
-export class HookTrello implements HookService {
+class TrelloHookService implements HookService {
   async setHooksForEvents(
     parsedEvents: EventHook[] | null,
     context: Context,
@@ -62,3 +62,19 @@ export class HookTrello implements HookService {
     return token;
   }
 }
+
+class GithubHookService implements HookService {
+  /**
+   *  Set up hooks to the given parsed events
+   * @param events Parsed events, refer to `EventHook` for more details
+   */
+  async setHooksForEvents(
+    events: EventHook[],
+    context: Context,
+  ): Promise<any | null> {
+    console.log(events, context);
+    return null;
+  }
+}
+
+export { TrelloHookService, GithubHookService };

@@ -1,4 +1,4 @@
-import { parseAction as trelloService } from '@services/trelloService';
+import { parseAction as trelloService } from '@src/services/messageService';
 import { hookUpdateCard } from './mocks/updateCard';
 
 describe('test trello translate message', () => {

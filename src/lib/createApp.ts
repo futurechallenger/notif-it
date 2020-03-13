@@ -30,7 +30,8 @@ function createApp(
   const app = Express();
 
   // View engine
-  const clientPath = '../../../views';
+  const clientPath =
+    process.env.NODE_ENV === 'development' ? '../../views' : '../../../views';
   app.engine('html', ejs.renderFile);
   app.set('view engine', 'html');
   app.set('views', path.join(__dirname, clientPath));

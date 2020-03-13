@@ -112,4 +112,33 @@ class TrelloEventService implements EventService {
   }
 }
 
-export { EventHook, WebHookType, TrelloEventService };
+/**
+  interface EventService {
+    getCurrentHooks(context: Context): Promise<any | null>;
+    getAllEvents(context: Context): Promise<any[] | null>;
+    parseHooks(context: Context): Promise<any | null>;
+    setEventsInContext(events: any[], context: Context): void;
+}
+ */
+class GithubEventService implements EventService {
+  async getCurrentHooks(context: Context): Promise<any | null> {
+    console.log(context);
+    return null;
+  }
+
+  async getAllEvents(context: Context): Promise<any[] | null> {
+    console.log(context);
+    return null;
+  }
+
+  async parseHooks(context: Context): Promise<any | null> {
+    console.log(context);
+    return null;
+  }
+
+  setEventsInContext(events: any[], context: Context) {
+    console.log(events, context);
+  }
+}
+
+export { EventHook, WebHookType, TrelloEventService, GithubEventService };

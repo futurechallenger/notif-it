@@ -14,6 +14,13 @@ class Config {
   expiration?: string;
 
   getOAuth2URL(config: OAuthConfig): string {
+    if ('service' in config) {
+      delete config.service;
+    }
+    if ('authType' in config) {
+      delete config.authType;
+    }
+
     // TODO: valid the config
     if ('clientIDAlias' in config) {
       const clientValue = config.clientId;
@@ -26,16 +33,19 @@ class Config {
     if ('returnURLAlias' in config) {
       const returnUrlValue = config.returnURL;
       const alias = config['returnURLAlias'];
-      delete config.returnURL;
+      delete config.returnURL, delete config.returnURLAlias;
       config[alias] = returnUrlValue;
     }
 
-    let url = `${config.serviceURL}${config.authPath}`;
-    delete config.serviceURL, delete config.authPath;
+    if ('scopeDivider' in config) {
+      const scope = config.scopes.join(config.scopeDivider || ',');
+      config.scope = scope;
+      delete config.scopes;
+      delete config.scopeDivider;
+    }
 
-    const scope = config.scopes.join(config.scopeDivider || ',');
-    config.scope = scope;
-    delete config.scopes;
+    let url = config.authURL;
+    delete config.serviceURL, delete config.authURL;
 
     let target: { [index: string]: any } = {};
     each(Object.keys(config), (k: string) => {

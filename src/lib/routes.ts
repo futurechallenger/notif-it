@@ -28,6 +28,8 @@ function configRouter(
   console.log('AUTH CONFIG', authConfig);
 
   const router = Express.Router();
+  context.authType = authConfig.authType;
+  context.tokenURL = authConfig.tokenURL;
   context.serviceURL = authConfig.serviceURL;
   context.service = authConfig.service;
   const config = new Config();
@@ -75,7 +77,23 @@ function configRouter(
   // Auth callback url
   router.get('/callback', async (req: Request, res: Response) => {
     console.log('==>Callback', req.query);
+    // Deal with oauth2.0: code => token
+
+    if (context.authType === 'oauth2.0') {
+      // TODO: state
+      const { code } = req.query;
+      Axios.post(context.tokenURL, {
+        client_id: process.env[`${context.service}_KEY`],
+        client_secret: process.env[`${context.service}_TOKEN`],
+        code,
+      });
+    }
     res.redirect('/success.html');
+  });
+
+  router.get('/callback/token', (req: Request, res: Response) => {
+    console.log(req.query);
+    res.json({ status: 'OK' });
   });
 
   router.post('/callback', async (req: Request, res: Response) => {
