@@ -158,7 +158,7 @@ function configRouter(
       });
       console.log('==>Parsed events', parsedEvents);
 
-      await hookService.setHooksForEvents(parsedEvents, context);
+      await hookService.setHooksForEvents(parsedEvents, { rid, ...context });
 
       res.json({ status: 'OK' });
     } catch (e) {
