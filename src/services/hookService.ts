@@ -72,7 +72,7 @@ class GithubHookService implements HookService {
     events: EventHook[],
     context: Context,
   ): Promise<any | null> {
-    console.log(events, context);
+    console.log('===>set hooks to events', events, context);
 
     if (!events || events.length <= 0) {
       return null;
@@ -101,7 +101,7 @@ class GithubHookService implements HookService {
               headers: { Authorization: `Bearer ${token}` },
             },
           );
-          console.log('set hook post', ret);
+          console.log('set hook post', { url, ret });
         } else if (action === 'delete') {
           url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
           ret = await Axios.delete(url, {
