@@ -185,6 +185,7 @@ function configRouter(
       console.log('===>Context ', context);
       const parsedEvents: EventHook[] = await eventHandler.parseHooks({
         rid,
+        token,
         currentEvents: events,
         ...context,
       });

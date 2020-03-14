@@ -73,7 +73,40 @@ class GithubHookService implements HookService {
     context: Context,
   ): Promise<any | null> {
     console.log(events, context);
+
+    if (!events || events.length <= 0) {
+      return null;
+    }
+    const { rid, serviceURL, service } = context;
+    const token = await this._getTokenByRID(+rid);
+    const keyName = this._getServiceName(service);
+
+    events.forEach(async ({ eventId, hookId, action }: EventHook) => {
+      let url = '';
+      if (action === 'post') {
+        url = `${serviceURL}/orgs/${eventId}/hooks`;
+        const ret = await Axios.post(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else if (action === 'delete') {
+      } else {
+      }
+    });
+
     return null;
+  }
+
+  private _getServiceName(service: string) {
+    return `${service.toUpperCase()}_KEY`;
+  }
+
+  private async _getTokenByRID(rid: number): Promise<string | null> {
+    const tkRet = await getTokenByRID(rid);
+    if (!tkRet) {
+      return null;
+    }
+    const token = tkRet.tk;
+    return token;
   }
 }
 
