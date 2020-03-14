@@ -54,7 +54,12 @@ const app = createApp(
     tokenURL: 'https://github.com/login/oauth/access_token',
     serviceURL: 'https://api.github.com',
     hostURL: host,
-    scopes: ['read:org', 'admin:repo_hook', 'repo_deployment'],
+    scopes: [
+      'admin:org',
+      'admin:org_hook',
+      'admin:repo_hook',
+      'repo_deployment',
+    ],
     scopeDivider: ' ',
     returnURL: `${host}/callback`,
     returnURLAlias: 'redirect_uri',
