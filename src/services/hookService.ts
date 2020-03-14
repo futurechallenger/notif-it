@@ -101,11 +101,13 @@ class GithubHookService implements HookService {
               headers: { Authorization: `Bearer ${token}` },
             },
           );
+          console.log('set hook post', ret);
         } else if (action === 'delete') {
           url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
           ret = await Axios.delete(url, {
             headers: { Authorization: `Bearer ${token}` },
           });
+          console.log('set hook delete', ret);
         } else {
           url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
 
@@ -122,10 +124,11 @@ class GithubHookService implements HookService {
               headers: { Authorization: `Bearer ${token}` },
             },
           );
+          console.log('set hook patch', ret);
         }
       });
 
-      return ret.data;
+      return ret;
     } catch (e) {
       console.error('==>ERROR: Set hook: ', e);
       return null;
