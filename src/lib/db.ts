@@ -126,7 +126,7 @@ async function storeTokenByID(
     } else {
       if (!token) {
         opRet = await client.query(
-          `update team set webhook=$1, updatedAt=$2  where id='${id}`,
+          `update team set hook=$1, updatedAt=$2  where id=${id}`,
           [webhook, +moment.utc().format('X')],
         );
       } else {
