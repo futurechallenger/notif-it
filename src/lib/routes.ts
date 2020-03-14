@@ -170,7 +170,7 @@ function configRouter(
 
       // Store events
       const ret = await storeEnvetsByRID(rid, events);
-      if (ret <= 0) {
+      if (ret < 0) {
         throw new Error('DB error in keep events');
       }
 

@@ -161,11 +161,11 @@ async function storeEnvetsByRID(
   events: string[],
 ): Promise<number> {
   const ret = await query(
-    'update team set events=$1, updatedAt=$2 where id=$3',
+    'update team set events=$1, updatedAt=$2 where id=$3 returning id',
     [events.join(','), +moment.utc().format('X'), rid],
   );
 
-  return ret.rowCount;
+  return !ret ? -1 : ret.rowCount;
 }
 
 async function getTeamEvents(teamId: string): Promise<any | null> {

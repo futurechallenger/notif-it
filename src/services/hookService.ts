@@ -81,49 +81,55 @@ class GithubHookService implements HookService {
     const token = await this._getTokenByRID(+rid);
     const keyName = this._getServiceName(service);
 
-    events.forEach(async ({ eventId, hookId, action }: EventHook) => {
-      let url = '';
+    try {
       let ret: any;
-      if (action === 'post') {
-        url = `${serviceURL}/orgs/${eventId}/hooks`;
-        ret = await Axios.post(
-          url,
-          {
-            name: 'web',
-            config: {
-              url: `${process.env.PROJECT_DOMAIN}/service/hook/${rid}`,
-              content_type: 'json',
-            },
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-      } else if (action === 'delete') {
-        url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
-        ret = await Axios.delete(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      } else {
-        url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
 
-        ret = await Axios.patch(
-          url,
-          {
-            name: 'web',
-            config: {
-              url: `${process.env.PROJECT_DOMAIN}/service/hook/${rid}`,
-              content_type: 'json',
+      events.forEach(async ({ eventId, hookId, action }: EventHook) => {
+        let url = '';
+        if (action === 'post') {
+          url = `${serviceURL}/orgs/${eventId}/hooks`;
+          ret = await Axios.post(
+            url,
+            {
+              name: 'web',
+              config: {
+                url: `${process.env.PROJECT_DOMAIN}/service/hook/${rid}`,
+                content_type: 'json',
+              },
             },
-          },
-          {
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+        } else if (action === 'delete') {
+          url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
+          ret = await Axios.delete(url, {
             headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-      }
-    });
+          });
+        } else {
+          url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
 
-    return null;
+          ret = await Axios.patch(
+            url,
+            {
+              name: 'web',
+              config: {
+                url: `${process.env.PROJECT_DOMAIN}/service/hook/${rid}`,
+                content_type: 'json',
+              },
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+        }
+      });
+
+      return ret.data;
+    } catch (e) {
+      console.error('==>ERROR: Set hook: ', e);
+      return null;
+    }
   }
 
   private _getServiceName(service: string) {
