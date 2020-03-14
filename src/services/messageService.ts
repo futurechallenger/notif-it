@@ -415,7 +415,26 @@ class TrelloMessageService implements MessageService {
 class GithubMessageService implements MessageService {
   parseEvent(payload: any, context: Context): any | null {
     console.log('==>message ', payload, context);
-    return;
+    /**
+      {
+        activity: `${action.memberCreator.fullName} created a card`,
+        //TODO: For temp test only
+        text: `${action.memberCreator.fullName} created a card`,
+        title:
+          '**Card**\n[' +
+          action.data.card.name +
+          '](https://trello.com/c/' +
+          action.data.card.shortLink +
+          ')',
+        body:
+          '**Board**\n[' +
+          action.data.board.name +
+          '](https://trello.com/b/' +
+          action.data.board.shortLink +
+          ')',
+      }
+     */
+    return { text: get(payload, 'action', '...') };
   }
 }
 

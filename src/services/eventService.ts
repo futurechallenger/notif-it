@@ -43,7 +43,7 @@ class TrelloEventService implements EventService {
 
   async parseHooks(context: Context): Promise<any | null> {
     const { currentEvents: dest = [] } = context;
-    const currentHooks = await this.getCurrentHooks(context);
+    const currentHooks = await this.getCurrentEvents(context);
 
     // No existing webhooks
     if (!currentHooks || currentHooks.length === 0) {
@@ -53,7 +53,7 @@ class TrelloEventService implements EventService {
     return this._compareEvents(dest, currentHooks);
   }
 
-  async getCurrentHooks(context: Context): Promise<any[] | null> {
+  async getCurrentEvents(context: Context): Promise<any[] | null> {
     const { rid, service, serviceURL } = context;
     const token = await this._getTokenByRID(+rid);
     const keyName = this._getServiceName(service);
@@ -94,12 +94,12 @@ class TrelloEventService implements EventService {
     return data;
   }
 
-  private _getServiceName(service: string) {
-    return `${service.toUpperCase()}_KEY`;
-  }
-
   setEventsInContext(events: any, context: Context) {
     context.events = events;
+  }
+
+  private _getServiceName(service: string) {
+    return `${service.toUpperCase()}_KEY`;
   }
 
   private async _getTokenByRID(rid: number): Promise<string | null> {
@@ -112,32 +112,113 @@ class TrelloEventService implements EventService {
   }
 }
 
-/**
-  interface EventService {
-    getCurrentHooks(context: Context): Promise<any | null>;
-    getAllEvents(context: Context): Promise<any[] | null>;
-    parseHooks(context: Context): Promise<any | null>;
-    setEventsInContext(events: any[], context: Context): void;
-}
- */
 class GithubEventService implements EventService {
-  async getCurrentHooks(context: Context): Promise<any | null> {
+  /**
+   * Repos have hooks
+   */
+  async getCurrentEvents(context: Context): Promise<any | null> {
     console.log(context);
-    return null;
+    try {
+      const { rid, host, token, service, serviceURL } = context;
+      const all = await this.getAllEvents(context);
+      // NOTE: do it one by one, no hurry
+      const hooked: any[] = [];
+      each(all, async (org: any) => {
+        const { data } = await Axios.get(`{serviceURL}/orgs/${org.id}/hooks`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (Array.isArray(data) && data.length > 0) {
+          const findRet = find(data, (h: any) => h.url.indexOf(host) >= 0);
+          // TODO: put org id and hook id
+          if (findRet) {
+            hooked.push({ eventId: org.id, hookId: findRet.id });
+          }
+        }
+      });
+
+      console.log('===>current orgs with hooks', hooked);
+
+      return hooked;
+    } catch (e) {
+      console.error('ERROR: get current events: ', e);
+      return null;
+    }
   }
 
   async getAllEvents(context: Context): Promise<any[] | null> {
-    console.log(context);
-    return null;
+    try {
+      const { rid, service, serviceURL } = context;
+      const token = await this._getTokenByRID(+rid);
+      // const keyName = this._getServiceName(service);
+
+      const url = `${serviceURL}/user/orgs`;
+      const { status, data } = await Axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log('==>all orgs', data);
+
+      if (status === 200) {
+        return data;
+      }
+
+      return null;
+    } catch (e) {
+      console.error('===>All events error: ', e);
+      return null;
+    }
   }
 
   async parseHooks(context: Context): Promise<any | null> {
     console.log(context);
+    const { currentEvents: dest = [] } = context;
+    const currentHooks = await this.getCurrentEvents(context);
+
+    // No existing webhooks
+    if (!currentHooks || currentHooks.length === 0) {
+      return dest.map((eId: string) => ({ eventId: eId, action: 'post' }));
+    }
+
     return null;
   }
 
-  setEventsInContext(events: any[], context: Context) {
-    console.log(events, context);
+  _compareEvents(dest: string[], currentHooks: WebHookType[]): EventHook[] {
+    const result: EventHook[] = [];
+    const temp: string[] = [];
+    currentHooks.forEach((el: any) => {
+      if (!find(dest, (ev: string) => el.id === ev)) {
+        result.push({ eventId: el.id, hookId: el.hookId, action: 'delete' });
+      } else {
+        temp.push(el.id);
+        result.push({ eventId: el.id, hookId: el.hookId, action: 'put' });
+      }
+    });
+
+    if (temp.length < dest.length) {
+      const diffed = difference(dest, temp);
+      each(diffed, (eId: string) => {
+        result.push({ eventId: eId, action: 'post' });
+      });
+    }
+
+    return result;
+  }
+
+  setEventsInContext(events: any, context: Context) {
+    context.events = events;
+  }
+
+  // private _getServiceName(service: string) {
+  //   return `${service.toUpperCase()}_KEY`;
+  // }
+
+  private async _getTokenByRID(rid: number): Promise<string | null> {
+    const tkRet = await getTokenByRID(rid);
+    if (!tkRet) {
+      return null;
+    }
+    const token = tkRet.tk;
+    return token;
   }
 }
 
