@@ -83,13 +83,43 @@ class GithubHookService implements HookService {
 
     events.forEach(async ({ eventId, hookId, action }: EventHook) => {
       let url = '';
+      let ret: any;
       if (action === 'post') {
         url = `${serviceURL}/orgs/${eventId}/hooks`;
-        const ret = await Axios.post(url, {
+        ret = await Axios.post(
+          url,
+          {
+            name: 'web',
+            config: {
+              url: `${process.env.PROJECT_DOMAIN}/service/hook/${rid}`,
+              content_type: 'json',
+            },
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+      } else if (action === 'delete') {
+        url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
+        ret = await Axios.delete(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
-      } else if (action === 'delete') {
       } else {
+        url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
+
+        ret = await Axios.patch(
+          url,
+          {
+            name: 'web',
+            config: {
+              url: `${process.env.PROJECT_DOMAIN}/service/hook/${rid}`,
+              content_type: 'json',
+            },
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
       }
     });
 
