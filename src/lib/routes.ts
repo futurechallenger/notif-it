@@ -122,6 +122,7 @@ function configRouter(
       const { rid = null } = req.decoded;
 
       console.log('===>/callback, REQ BODY', req.body);
+      console.log('===>/callback, decoded', req.decoded);
       console.log(`===>/callback, webhook: ${webhook}, `);
 
       const ret = await storeTokenByID(webhook, token, rid);
