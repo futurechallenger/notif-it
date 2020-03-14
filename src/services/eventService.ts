@@ -18,6 +18,12 @@ interface WebHookType {
   active?: boolean;
 }
 
+interface EventType {
+  id: string;
+  name: string;
+  desc: string;
+}
+
 class TrelloEventService implements EventService {
   _compareEvents(dest: string[], currentHooks: WebHookType[]): EventHook[] {
     const result: EventHook[] = [];
@@ -89,16 +95,9 @@ class TrelloEventService implements EventService {
       throw new Error('Get boards error');
     }
 
-    // process the events format
-    const events = (data as any[]).map((ev: any) => ({
-      id: ev.id,
-      name: ev.login,
-      desc: ev.description,
-    }));
+    this.setEventsInContext(data, context);
 
-    this.setEventsInContext(events, context);
-
-    return events;
+    return data;
   }
 
   setEventsInContext(events: any, context: Context) {
@@ -165,11 +164,20 @@ class GithubEventService implements EventService {
 
       console.log('==>all orgs', data);
 
-      if (status === 200) {
-        return data;
+      if (status !== 200) {
+        return null;
       }
 
-      return null;
+      // process the events format
+      const events: EventType[] = (data as any[]).map((ev: any) => ({
+        id: ev.id,
+        name: ev.login,
+        desc: ev.description,
+      }));
+
+      this.setEventsInContext(events, context);
+
+      return events;
     } catch (e) {
       console.error('===>All events error: ', e);
       return null;
