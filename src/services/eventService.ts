@@ -89,9 +89,16 @@ class TrelloEventService implements EventService {
       throw new Error('Get boards error');
     }
 
-    this.setEventsInContext(data, context);
+    // process the events format
+    const events = (data as any[]).map((ev: any) => ({
+      id: ev.id,
+      name: ev.login,
+      desc: ev.description,
+    }));
 
-    return data;
+    this.setEventsInContext(events, context);
+
+    return events;
   }
 
   setEventsInContext(events: any, context: Context) {
