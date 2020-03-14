@@ -170,7 +170,7 @@ class GithubEventService implements EventService {
 
       // process the events format
       const events: EventType[] = (data as any[]).map((ev: any) => ({
-        id: ev.id,
+        id: ev.login,
         name: ev.login,
         desc: ev.description,
       }));
