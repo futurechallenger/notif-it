@@ -88,12 +88,16 @@ class GithubHookService implements HookService {
         let url = '';
         if (action === 'post') {
           url = `${serviceURL}/orgs/${eventId}/hooks`;
+          const hookURL = `${process.env.PROJECT_DOMAIN}/service/hook/${rid}`;
+
+          console.log('===>SET hook post', { url, hookURL });
+
           ret = await Axios.post(
             url,
             {
               name: 'web',
               config: {
-                url: `${process.env.PROJECT_DOMAIN}/service/hook/${rid}`,
+                url: hookURL,
                 content_type: 'json',
               },
             },
@@ -101,22 +105,24 @@ class GithubHookService implements HookService {
               headers: { Authorization: `Bearer ${token}` },
             },
           );
-          console.log('set hook post', { url, ret });
         } else if (action === 'delete') {
           url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
+          console.log('===>SET hook post', { url });
           ret = await Axios.delete(url, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          console.log('set hook delete', ret);
         } else {
           url = `${serviceURL}/orgs/${eventId}/hooks/${hookId}`;
+          const hookURL = `${process.env.PROJECT_DOMAIN}/service/hook/${rid}`;
+
+          console.log('set hook delete', { url, hookURL });
 
           ret = await Axios.patch(
             url,
             {
               name: 'web',
               config: {
-                url: `${process.env.PROJECT_DOMAIN}/service/hook/${rid}`,
+                url: hookURL,
                 content_type: 'json',
               },
             },
