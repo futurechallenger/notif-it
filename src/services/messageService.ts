@@ -13,19 +13,16 @@ function parseEventContent(payload: any, events?: string) {
     return;
   }
 
-  this.payload = payload;
-  this.events = events || '';
-
   /**
    * Filter if the event is subscribed
    * oldEN: this param maybe deprecated
    */
   const canPost = (oldEN: string): boolean => {
     console.log('==>Old event name is', oldEN);
-    console.log('==>Subscribed events', this.events);
+    console.log('==>Subscribed events', events);
 
-    const eventName = get(this.payload, 'model.id', null);
-    return this.events.indexOf(eventName) >= 0;
+    const eventName = get(payload, 'model.id', null);
+    return events.indexOf(eventName) >= 0;
   };
 
   const createList = () => {
@@ -33,7 +30,7 @@ function parseEventContent(payload: any, events?: string) {
       return null;
     }
 
-    const action = this.payload.action;
+    const action = payload.action;
     return {
       activity: action.memberCreator.fullName + ' created a list',
       title: '**List**\n' + action.data.list.name,
@@ -47,7 +44,7 @@ function parseEventContent(payload: any, events?: string) {
   };
 
   const updateList = () => {
-    const action = this.payload.action;
+    const action = payload.action;
     const old =
       action && action.data && action.data && action.data.old
         ? action.data.old
@@ -89,7 +86,7 @@ function parseEventContent(payload: any, events?: string) {
       return null;
     }
 
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity: action.memberCreator.fullName + ' moved a list',
       title: '**List**\n' + action.data.list.name,
@@ -107,7 +104,7 @@ function parseEventContent(payload: any, events?: string) {
       return null;
     }
 
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity: action.memberCreator.fullName + ' moved a list',
       title: '**List**\n' + action.data.list.name,
@@ -124,7 +121,7 @@ function parseEventContent(payload: any, events?: string) {
   };
 
   const updateBoard = () => {
-    var action = this.payload.action;
+    var action = payload.action;
     if (
       !canPost('board_renamed') ||
       !action ||
@@ -145,7 +142,7 @@ function parseEventContent(payload: any, events?: string) {
     if (!canPost('board_member_added')) {
       return null;
     }
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity:
         action.member.fullName +
@@ -165,7 +162,7 @@ function parseEventContent(payload: any, events?: string) {
     if (!canPost('card_created')) {
       return null;
     }
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity: `${action.memberCreator.fullName} created a card`,
       //TODO: For temp test only
@@ -189,7 +186,7 @@ function parseEventContent(payload: any, events?: string) {
     if (!canPost('card_moved')) {
       return null;
     }
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity: action.memberCreator.fullName + ' moved a card',
       title: '**Card**\n' + action.data.card.name,
@@ -209,7 +206,7 @@ function parseEventContent(payload: any, events?: string) {
       return null;
     }
 
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity: action.memberCreator.fullName + ' moved a card',
       title: '**Card**\n' + action.data.card.name,
@@ -223,7 +220,7 @@ function parseEventContent(payload: any, events?: string) {
   };
 
   const updateCard = () => {
-    var action = this.payload.action;
+    var action = payload.action;
     var old = action.data.old;
     if ('idList' in old && canPost('card_moved')) {
       return {
@@ -274,7 +271,7 @@ function parseEventContent(payload: any, events?: string) {
       return null;
     }
 
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity: `${action.memberCreator.fullName} commented on  ${action.data.card.name}`,
       //TODO: For temp test only
@@ -288,7 +285,7 @@ function parseEventContent(payload: any, events?: string) {
       return null;
     }
 
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity: `${action.memberCreator.fullName} added an attachment to ${action.data.card.name}`,
       title: `**File**\n[${action.data.attachment.name}](${action.data.attachment.url})`,
@@ -300,7 +297,7 @@ function parseEventContent(payload: any, events?: string) {
       return null;
     }
 
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity: `${action.member.fullName} added to ${action.data.card.name} card`,
       //TODO: For temp test only
@@ -313,7 +310,7 @@ function parseEventContent(payload: any, events?: string) {
       return null;
     }
 
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity: `${action.memberCreator.fullName} added a checklist to ${action.data.card.name}`,
       title: `**Checklist**\n' ${action.data.checklist.name}`,
@@ -324,7 +321,7 @@ function parseEventContent(payload: any, events?: string) {
     if (!canPost('checklist_created')) {
       return null;
     }
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity: `${action.memberCreator.fullName} added a checklist item to ${action.data.card.name}`,
       title: `**Item**\n ${action.data.checkItem.name}`,
@@ -336,7 +333,7 @@ function parseEventContent(payload: any, events?: string) {
     if (!canPost('checklist_toggled')) {
       return null;
     }
-    var action = this.payload.action;
+    var action = payload.action;
     return {
       activity:
         action.data.checkItem.state === 'complete'
@@ -409,6 +406,7 @@ class TrelloMessageService implements MessageService {
   parseEvent(payload: any, context: Context): any | null {
     const { events = '' } = context;
     const ret = parseEventContent(payload, events as string);
+    return ret;
   }
 }
 
