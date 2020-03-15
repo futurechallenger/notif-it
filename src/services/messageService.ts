@@ -434,7 +434,7 @@ class GithubMessageService implements MessageService {
           ')',
       }
      */
-    return { text: get(payload, 'action', '...') };
+    return { text: get(payload, 'ref', '...') };
   }
 }
 

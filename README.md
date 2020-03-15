@@ -5,5 +5,5 @@
 - [ ] JWT for security
 - [ ] Multiple service suport
 - [ ] Message translating engine
+- [ ] Message
 - [x] Update board list
-- [x] Message
