@@ -434,7 +434,12 @@ class GithubMessageService implements MessageService {
           ')',
       }
      */
-    return { text: get(payload, 'ref', '...') };
+    const ref = get(payload, 'ref', '...');
+    const commitMessage = get(payload, 'commits[0].message', '...');
+    const commitAuthor = get(payload, 'commits[0].author.name', '...');
+    return {
+      text: `ref: ${ref}, message: ${commitMessage}, author: ${commitAuthor}`,
+    };
   }
 }
 
