@@ -1,0 +1,11 @@
+{
+  "name": "apps",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@notifiit/core": "1.0.0",
+    "@notifiit/message-engine": "1.0.0",
+    "@notifiit/dynamic-ui": "1.0.0"
+  }
+}

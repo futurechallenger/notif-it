@@ -7,3 +7,5 @@
 - [ ] Message translating engine
 - [ ] Message
 - [x] Update board list
+
+### Data storage

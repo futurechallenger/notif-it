@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    // "noEmit": true,
+    "jsx": "react",
+    "types": ["jest", "node"],
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "lib": ["ESNext"],
+    "target": "esnext",
+    "allowJs": true,
+    // "allowSyntheticDefaultImports": true,
+    "esModuleInterop": false,
+    "alwaysStrict": true,
+    "strict": false,
+    "baseUrl": ".",
+    // "rootDir": ".", // Key to keep the directory structure in build
+    "outDir": "./build",
+    "paths": {
+      "@src/*": ["src/*"],
+      "@services/*": ["src/services/*"],
+      "@util/*": ["src/util/*"],
+      "@lib/*": ["src/lib/*"]
+    }
+  },
+  // "exclude": ["**/*.js"]
+  "exclude": ["node_modules", "build", "client", "views"]
+}
