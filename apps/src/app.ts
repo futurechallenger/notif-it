@@ -1,14 +1,14 @@
+import 'module-alias/register';
 import {
   createApp,
   EventService,
   HookService,
   MessageService,
 } from '@notifiit/core';
-import { GithubEventService } from '@services/eventService';
-import { GithubHookService } from '@services/hookService';
-import { GithubMessageService } from '@services/messageService';
+import { GithubEventService } from './services/eventService';
+import { GithubHookService } from './services/hookService';
+import { GithubMessageService } from './services/messageService';
 import * as dotenv from 'dotenv';
-import 'module-alias/register';
 
 // load dotenv
 dotenv.config();

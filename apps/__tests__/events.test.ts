@@ -1,4 +1,4 @@
-import { TrelloEventService } from '@services/eventService';
+import { TrelloEventService } from '../src/services/eventService';
 
 describe('Test events parser', () => {
   it('compare current hooks of events and events', () => {
