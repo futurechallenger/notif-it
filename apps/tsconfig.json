@@ -27,5 +27,5 @@
     }
   },
   // "exclude": ["**/*.js"]
-  "exclude": ["node_modules", "build", "client", "views"]
+  "exclude": ["node_modules", "build", "client", "_views"]
 }

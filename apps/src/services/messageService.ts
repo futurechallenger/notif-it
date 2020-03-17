@@ -1,5 +1,4 @@
-import { MessageService } from '@notifiit/core/common';
-import { Context } from '@notifiit/core/types';
+import { Context, MessageService } from '@notifiit/core';
 import { get } from 'lodash';
 
 /**

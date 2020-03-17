@@ -1,4 +1,4 @@
-import { Config } from '@src/config';
+import { Config } from './config';
 import Axios from 'axios';
 import * as dotenv from 'dotenv';
 import * as Express from 'express';

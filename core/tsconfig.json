@@ -5,6 +5,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": true,
     // "noEmit": true,
+    "declaration": true,
     "jsx": "react",
     "types": ["jest", "node"],
     "moduleResolution": "node",
@@ -16,16 +17,17 @@
     "esModuleInterop": false,
     "alwaysStrict": true,
     "strict": false,
-    "baseUrl": ".",
-    // "rootDir": ".", // Key to keep the directory structure in build
-    "outDir": "./build",
-    "paths": {
-      "@src/*": ["src/*"],
-      "@services/*": ["src/services/*"],
-      "@util/*": ["src/util/*"],
-      "@lib/*": ["src/lib/*"]
-    }
+    // "baseUrl": "./src",
+    // "rootDir": "./src", // Key to keep the directory structure in build
+    "outDir": "./build"
+    // "paths": {
+    //   "@src/*": ["src/*"],
+    //   "@services/*": ["src/services/*"],
+    //   "@util/*": ["src/util/*"],
+    //   "@lib/*": ["src/lib/*"]
+    // }
   },
   // "exclude": ["**/*.js"]
-  "exclude": ["node_modules", "build", "client", "views"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build", "**/*.test.ts"]
 }

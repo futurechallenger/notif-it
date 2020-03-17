@@ -1,6 +1,4 @@
-import { HookService } from '@notifiit/core/common';
-import { getTokenByRID } from '@notifiit/core/db';
-import { Context } from '@notifiit/core/types';
+import { getTokenByRID, HookService, Context } from '@notifiit/core';
 import Axios from 'axios';
 import { EventHook } from './eventService';
 

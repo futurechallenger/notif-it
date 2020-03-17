@@ -1,4 +1,4 @@
-import { Config } from '@src/config';
+import { Config } from './config';
 import * as QueryString from 'query-string';
 
 describe('Test url generating from config', () => {
