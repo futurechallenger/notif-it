@@ -1,6 +1,6 @@
+import { MessageService } from '@notifiit/core/common';
+import { Context } from '@notifiit/core/types';
 import { get } from 'lodash';
-import { MessageService } from '@src/lib/common';
-import { Context } from '../lib/types';
 
 /**
  * Event filter is now based on board, not actions in a board

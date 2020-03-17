@@ -1,11 +1,11 @@
-import { Config } from '@lib/config';
+import { Config } from '@src/config';
 import Axios from 'axios';
 import * as dotenv from 'dotenv';
 import * as Express from 'express';
 import * as jwt from 'jsonwebtoken';
 import * as qs from 'query-string';
 import { get } from 'lodash';
-import { EventHook } from '../services/eventService';
+import { EventHook } from './types';
 import { EventService, HookService, MessageService } from './common';
 import {
   getEventsByRID,

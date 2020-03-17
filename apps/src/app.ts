@@ -1,16 +1,17 @@
 import * as dotenv from 'dotenv';
 import 'module-alias/register';
-import { createApp } from './lib/createApp';
-import { HookService, EventService, MessageService } from './lib/common';
-import { TrelloHookService, GithubHookService } from './services/hookService';
+import { createApp } from '@notifiit/core/createApp';
 import {
-  TrelloEventService,
-  GithubEventService,
-} from './services/eventService';
+  HookService,
+  EventService,
+  MessageService,
+} from '@notifiit/core/common';
+import { TrelloHookService, GithubHookService } from '@services/hookService';
+import { TrelloEventService, GithubEventService } from '@services/eventService';
 import {
   TrelloMessageService,
   GithubMessageService,
-} from './services/messageService';
+} from '@services/messageService';
 
 // load dotenv
 dotenv.config();

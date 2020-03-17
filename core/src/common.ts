@@ -1,5 +1,4 @@
-import { EventHook } from '../services/eventService';
-import { Context } from './types';
+import { Context, EventHook } from './types';
 
 interface HookService {
   /**

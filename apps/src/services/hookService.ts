@@ -1,7 +1,7 @@
-import { getTokenByRID } from '@src/lib/db';
+import { HookService } from '@notifiit/core/common';
+import { getTokenByRID } from '@notifiit/core/db';
+import { Context } from '@notifiit/core/types';
 import Axios from 'axios';
-import { HookService } from '../lib/common';
-import { Context } from '../lib/types';
 import { EventHook } from './eventService';
 
 class TrelloHookService implements HookService {

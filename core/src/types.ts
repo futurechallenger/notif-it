@@ -1,5 +1,25 @@
 import * as Express from 'express';
 
+interface EventHook {
+  eventId: string;
+  hookId?: string;
+  action: 'put' | 'post' | 'delete';
+}
+
+interface WebHookType {
+  id?: string;
+  description?: string;
+  idModel: string;
+  callbackURL?: string;
+  active?: boolean;
+}
+
+interface EventType {
+  id: string;
+  name: string;
+  desc: string;
+}
+
 interface DecodedType {
   rid: number;
   teamId: string;
@@ -73,4 +93,7 @@ export {
   Router,
   OAuthConfig,
   Context,
+  WebHookType,
+  EventHook,
+  EventType,
 };

@@ -1,28 +1,13 @@
 import Axios from 'axios';
-import { getTokenByRID } from '@src/lib/db';
+import { getTokenByRID } from '@notifiit/core/db';
 import { difference, each, find } from 'lodash';
-import { EventService } from '../lib/common';
-import { Context } from '../lib/types';
-
-interface EventHook {
-  eventId: string;
-  hookId?: string;
-  action: 'put' | 'post' | 'delete';
-}
-
-interface WebHookType {
-  id?: string;
-  description?: string;
-  idModel: string;
-  callbackURL?: string;
-  active?: boolean;
-}
-
-interface EventType {
-  id: string;
-  name: string;
-  desc: string;
-}
+import { EventService } from '@notifiit/core/common';
+import {
+  Context,
+  EventHook,
+  WebHookType,
+  EventType,
+} from '@notifiit/core/types';
 
 class TrelloEventService implements EventService {
   _compareEvents(dest: string[], currentHooks: WebHookType[]): EventHook[] {

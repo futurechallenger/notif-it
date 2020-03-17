@@ -13,12 +13,6 @@
     "message-engine",
     "dynamic-ui"
   ],
-  "scripts": {
-    "build:server": "./node_modules/.bin/tsc -p .",
-    "build:client": "sh ./scripts/build_client.sh",
-    "start": "node build/app.js",
-    "lint-staged": "lint-staged"
-  },
   "devDependencies": {
     "husky": "^4.2.3",
     "jest": "^25.1.0",
