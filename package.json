@@ -7,6 +7,9 @@
   "engines": {
     "node": "10.x"
   },
+  "scripts": {
+    "lint-staged": "lint-staged"
+  },
   "workspaces": [
     "core",
     "apps",

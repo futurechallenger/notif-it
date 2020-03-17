@@ -2,7 +2,6 @@
   "name": "@notifiit/core",
   "version": "1.0.0",
   "main": "./build/index.js",
-  "types": "./build/index.d.ts",
   "license": "MIT",
   "scripts": {
     "build": "./node_modules/.bin/tsc -p .",
