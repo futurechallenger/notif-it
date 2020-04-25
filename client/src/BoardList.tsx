@@ -16,7 +16,7 @@ type SelectActionType = {
   type: 'INIT' | 'TOGGLE' | 'RESET';
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: any) => ({
   root: {
     display: 'flex',
     flexWrap: 'wrap',
